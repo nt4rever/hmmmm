@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  hmmmm_api_dev:
+    container_name: hmmmm_api_dev
+    image: hmmmm_api_dev:1.0.0
+    build:
+      context: .
+      target: development
+    command: npm run start:dev
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./:/usr/src/app
+    restart: unless-stopped
+  hmmmm_mongodb:
+    container_name: ${DATABASE_HOST}
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+    expose:
+      - ${DATABASE_PORT}
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    volumes:
+      - ./mongo-data:/data/db
+    restart: unless-stopped
+  hmmmm_redis:
+    container_name: ${REDIS_HOST}
+    image: redis:alpine
+    expose:
+      - ${REDIS_PORT}
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
