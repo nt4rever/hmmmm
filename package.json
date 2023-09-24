@@ -35,7 +35,9 @@
     "@nestjs/swagger": "^7.1.12",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "helmet": "^7.0.0",
     "mongoose": "^7.5.2",
+    "morgan": "^1.10.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1"
   },
@@ -81,6 +83,18 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1",
+      "^@modules/(.*)$": "<rootDir>/modules/$1",
+      "^@services/(.*)$": "<rootDir>/services/$1",
+      "^@repositories/(.*)$": "<rootDir>/repositories/$1",
+      "^@config/(.*)$": "<rootDir>/configs/$1",
+      "^@constraints/(.*)$": "<rootDir>/constraints/$1",
+      "^@custom-types/(.*)$": "<rootDir>/types/$1",
+      "^@exception-filters/(.*)$": "<rootDir>/exception-filters/$1",
+      "^@interceptors/(.*)$": "<rootDir>/interceptors/$1",
+      "^@pipes/(.*)$": "<rootDir>/pipes/$1"
+    }
   }
 }

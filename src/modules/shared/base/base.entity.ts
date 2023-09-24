@@ -1,8 +1,10 @@
 import { Prop } from '@nestjs/mongoose';
+import { ApiHideProperty } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
 import { ObjectId } from 'mongoose';
 
 export class BaseEntity {
+  @ApiHideProperty()
   _id?: ObjectId | string;
 
   @Expose()

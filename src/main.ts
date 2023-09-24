@@ -1,8 +1,10 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { configSwagger } from '@configs/api-docs.config';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { configSwagger } from '@configs/api-docs.config';
+import { NestFactory } from '@nestjs/core';
+import helmet from 'helmet';
+import * as morgan from 'morgan';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
@@ -13,7 +15,17 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
-  configSwagger(app);
+  app.setGlobalPrefix(configService.get('API_PREFIX'));
+  app.use(helmet());
+  app.use(morgan('tiny'));
+
+  if (
+    !configService.get('SWAGGER_ENABLE') ||
+    configService.get('SWAGGER_ENABLE') === '1'
+  ) {
+    configSwagger(app);
+  }
+
   await app.listen(configService.get('PORT') || 8000, () => {
     logger.log(
       `Application running on port http://localhost:${
