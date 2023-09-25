@@ -27,6 +27,7 @@
       "@exception-filters/*": ["src/exception-filters/*"],
       "@interceptors/*": ["src/interceptors/*"],
       "@pipes/*": ["src/pipes/*"],
+      "@decorators/*": ["src/decorators/*"],
     }
   }
 }

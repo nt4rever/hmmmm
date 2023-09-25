@@ -7,19 +7,25 @@ import {
   Get,
   Param,
   Post,
+  Req,
   UseFilters,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto';
 import { GENDER, User } from './entities';
 import { UsersService } from './users.service';
 import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
+import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
+import { RequestWithUser } from '@custom-types/requests.type';
 
 @Controller('users')
 @ApiTags('users')
+@ApiBearerAuth('token')
 @UseInterceptors(MongooseClassSerializerInterceptor(User))
 @UseFilters(MongoExceptionFilter)
+@UseGuards(JwtAccessTokenGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Post()
@@ -41,6 +47,11 @@ export class UsersController {
   })
   create(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);
+  }
+
+  @Get('/me')
+  me(@Req() { user }: RequestWithUser) {
+    return user;
   }
 
   @Get(':id')

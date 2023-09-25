@@ -2,7 +2,6 @@ import { configSwagger } from '@configs/api-docs.config';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import helmet from 'helmet';
 import * as morgan from 'morgan';
 import { AppModule } from './app.module';
 
@@ -16,7 +15,7 @@ async function bootstrap() {
     }),
   );
   app.setGlobalPrefix(configService.get('API_PREFIX'));
-  app.use(helmet());
+  app.enableCors();
   app.use(morgan('tiny'));
 
   if (

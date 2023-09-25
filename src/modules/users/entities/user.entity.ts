@@ -1,6 +1,9 @@
 import { BaseEntity } from '@modules/shared/base';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { RefreshToken, RefreshTokenSchema } from './refresh-token.entity';
+import { Exclude, Type } from 'class-transformer';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 export enum GENDER {
   Male = 'MALE',
@@ -49,9 +52,10 @@ export class User extends BaseEntity {
   })
   phone_number: string;
 
+  @Exclude()
+  @ApiHideProperty()
   @Prop({
     required: true,
-    select: false,
   })
   password: string;
 
@@ -72,6 +76,18 @@ export class User extends BaseEntity {
     default: true,
   })
   isActive: boolean;
+
+  @Exclude()
+  @ApiHideProperty()
+  @Prop({
+    type: [
+      {
+        type: RefreshTokenSchema,
+      },
+    ],
+  })
+  @Type(() => RefreshToken)
+  refresh_token: RefreshToken[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

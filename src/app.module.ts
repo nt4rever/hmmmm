@@ -1,4 +1,6 @@
 import { DatabaseConfig, database_config } from '@configs/configuration.config';
+import { ClassValidatorExceptionFilter } from '@exception-filters/class-validator-exception.filter';
+import { AuthModule } from '@modules/auth/auth.module';
 import { UsersModule } from '@modules/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -24,12 +26,17 @@ import { GlobalExceptionFilter } from './exception-filters/global-exception.filt
       inject: [ConfigService],
     }),
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ClassValidatorExceptionFilter,
     },
   ],
 })
