@@ -1,5 +1,6 @@
 import { DatabaseConfig, database_config } from '@configs/configuration.config';
 import { ClassValidatorExceptionFilter } from '@exception-filters/class-validator-exception.filter';
+import { MongoExceptionFilter } from '@exception-filters/mongo-exception.filter';
 import { AuthModule } from '@modules/auth/auth.module';
 import { UsersModule } from '@modules/users/users.module';
 import { Module } from '@nestjs/common';
@@ -37,6 +38,10 @@ import { GlobalExceptionFilter } from './exception-filters/global-exception.filt
     {
       provide: APP_FILTER,
       useClass: ClassValidatorExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: MongoExceptionFilter,
     },
   ],
 })

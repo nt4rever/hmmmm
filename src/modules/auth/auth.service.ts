@@ -12,7 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import mongoose from 'mongoose';
 import { SignUpDto } from './dto';
-import { TokenPayload } from './interfaces';
+import { RefreshTokenPayload, TokenPayload } from './interfaces';
 
 @Injectable()
 export class AuthService {
@@ -28,8 +28,12 @@ export class AuthService {
 
   async signUp(dto: SignUpDto) {
     try {
+      // Find exists User (with trashed).
       const existedUser = await this.usersService.findOneByCondition({
         email: dto.email,
+        deleted_at: {
+          $ne: null,
+        },
       });
       if (existedUser) {
         throw new ConflictException(ERRORS_DICTIONARY.EMAIL_EXISTED);
@@ -60,7 +64,11 @@ export class AuthService {
 
   async getAuthenticatedUser(email: string, password: string): Promise<User> {
     try {
-      const user = await this.usersService.getUserByEmail(email);
+      const user = await this.usersService.findOneByCondition({
+        email,
+        isActive: true,
+      });
+      if (!user) throw new UnauthorizedException();
       await this.verifyPlainContentWithHashedContent(password, user.password);
 
       return user;
@@ -93,6 +101,7 @@ export class AuthService {
     try {
       const user = await this.usersService.findOneByCondition({
         _id: userId,
+        isActive: true,
       });
       if (!user) {
         throw new UnauthorizedException(ERRORS_DICTIONARY.UNAUTHORIZED_EXCEPTION);
@@ -119,7 +128,7 @@ export class AuthService {
     });
   }
 
-  generateRefreshToken(payload: TokenPayload & { token_id: string }) {
+  generateRefreshToken(payload: RefreshTokenPayload) {
     return this.jwtService.sign(payload, {
       privateKey: this.configService.get<string>('JWT_REFRESH_TOKEN_PRIVATE_KEY'),
       expiresIn:

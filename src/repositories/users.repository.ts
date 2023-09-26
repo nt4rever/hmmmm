@@ -25,9 +25,7 @@ export class UsersRepository
         },
         {
           $push: {
-            refresh_token: {
-              ...data,
-            },
+            refresh_token: data,
           },
         },
         {

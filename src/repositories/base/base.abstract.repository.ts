@@ -1,6 +1,6 @@
-import { FilterQuery, Model, QueryOptions } from 'mongoose';
-import { BaseEntity } from '@modules/shared/base';
 import { FindAllResponse } from '@custom-types/common.type';
+import { BaseEntity } from '@modules/shared/base';
+import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { BaseRepositoryInterface } from './base.interface.repository';
 
 export abstract class BaseRepositoryAbstract<T extends BaseEntity>
@@ -21,8 +21,8 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   async findOneByCondition(condition: object): Promise<T> {
     return await this.model
       .findOne({
-        ...condition,
         deleted_at: null,
+        ...condition,
       })
       .exec();
   }

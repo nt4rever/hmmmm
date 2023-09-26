@@ -35,7 +35,7 @@ export class AuthController {
   @ApiBody({
     type: SignUpDto,
     examples: {
-      user_1: {
+      random_user: {
         value: {
           first_name: faker.person.firstName(),
           last_name: faker.person.lastName(),
@@ -44,7 +44,15 @@ export class AuthController {
           date_of_birth: faker.date.birthdate(),
           password: 'password',
           gender: GENDER.Male,
-          device_name: 'iphone XS',
+          device_name: 'Iphone XS',
+        } as SignUpDto,
+      },
+      default_user: {
+        value: {
+          first_name: 'John',
+          last_name: 'Alice',
+          email: 'alice@gmail.com',
+          password: 'abcd1234@@',
         } as SignUpDto,
       },
     },
@@ -115,13 +123,13 @@ export class AuthController {
   @ApiBody({
     type: SignUpDto,
     examples: {
-      user_1: {
+      default_user: {
         value: {
-          email: 'Adell_Lynch@gmail.com',
-          password: 'password',
+          email: 'alice@gmail.com',
+          password: 'abcd1234@@',
         } as SignUpDto,
       },
-      user_2: {
+      error_user: {
         value: {
           email: 'michaelsmith@example.com',
           password: '1232@asdS',
@@ -157,9 +165,32 @@ export class AuthController {
     return await this.authService.signIn(request.user._id.toString());
   }
 
-  @Post('refresh')
-  @ApiBearerAuth('token')
   @UseGuards(JwtRefreshTokenGuard)
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('token')
+  @ApiResponse({
+    status: 200,
+    description: 'Create new access token successfully!!',
+    content: {
+      'application/json': {
+        example: {
+          access_token: 'token',
+        },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Unauthorized!!',
+    content: {
+      'application/json': {
+        example: {
+          statusCode: 401,
+          message: 'Unauthorized',
+        },
+      },
+    },
+  })
   async refreshAccessToken(@Req() request: RequestWithUser) {
     const { user } = request;
     const access_token = this.authService.generateAccessToken({

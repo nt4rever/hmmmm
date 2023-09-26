@@ -1,6 +1,7 @@
-import { MongoExceptionFilter } from '@exception-filters/mongo-exception.filter';
+import { RequestWithUser } from '@custom-types/requests.type';
 import { faker } from '@faker-js/faker';
 import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
+import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import {
   Body,
   Controller,
@@ -8,23 +9,19 @@ import {
   Param,
   Post,
   Req,
-  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
 import { CreateUserDto } from './dto';
 import { GENDER, User } from './entities';
 import { UsersService } from './users.service';
-import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
-import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
-import { RequestWithUser } from '@custom-types/requests.type';
 
 @Controller('users')
 @ApiTags('users')
 @ApiBearerAuth('token')
 @UseInterceptors(MongooseClassSerializerInterceptor(User))
-@UseFilters(MongoExceptionFilter)
 @UseGuards(JwtAccessTokenGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
