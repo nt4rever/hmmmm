@@ -32,7 +32,7 @@ export class AuthService {
       const existedUser = await this.usersService.findOneByCondition({
         email: dto.email,
         deleted_at: {
-          $ne: null,
+          $exists: true,
         },
       });
       if (existedUser) {
