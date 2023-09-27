@@ -11,6 +11,13 @@ export enum GENDER {
   Other = 'OTHER',
 }
 
+export enum ROLES {
+  Admin = 'ADMIN',
+  AreaManager = 'AREA_MANAGER',
+  Volunteer = 'VOLUNTEER',
+  User = 'USER',
+}
+
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({
@@ -70,7 +77,7 @@ export class User extends BaseEntity {
   @Prop({
     enum: GENDER,
   })
-  gender: string;
+  gender: GENDER;
 
   @Prop({
     default: true,
@@ -88,6 +95,12 @@ export class User extends BaseEntity {
   })
   @Type(() => RefreshToken)
   refresh_token: RefreshToken[];
+
+  @Prop({
+    enum: ROLES,
+    default: ROLES.User,
+  })
+  role: ROLES;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

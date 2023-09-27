@@ -11,6 +11,10 @@ export class BaseEntity {
   @Transform((value) => value.obj?._id?.toString(), { toClassOnly: true })
   id?: string;
 
+  created_at?: Date;
+
+  updated_at?: Date;
+
   @Prop({ default: null })
   deleted_at?: Date;
 }
