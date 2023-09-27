@@ -23,8 +23,8 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto';
-import { LocalAuthGuard } from './guards/local.guard';
 import { JwtRefreshTokenGuard } from './guards/jwt-refresh-token.guard';
+import { LocalAuthGuard } from './guards/local.guard';
 
 @Controller('auth')
 @ApiTags('auth')

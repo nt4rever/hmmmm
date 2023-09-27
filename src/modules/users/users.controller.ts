@@ -1,7 +1,9 @@
 import { RequestWithUser } from '@custom-types/requests.type';
+import { Roles } from '@decorators/roles.decorator';
 import { faker } from '@faker-js/faker';
 import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
+import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import {
   Body,
   Controller,
@@ -15,7 +17,7 @@ import {
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
 import { CreateUserDto } from './dto';
-import { GENDER, User } from './entities';
+import { GENDER, ROLES, User } from './entities';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -25,6 +27,9 @@ import { UsersService } from './users.service';
 @UseGuards(JwtAccessTokenGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Roles(ROLES.Admin, ROLES.AreaManager)
+  @UseGuards(RolesGuard)
   @Post()
   @ApiBody({
     type: CreateUserDto,
