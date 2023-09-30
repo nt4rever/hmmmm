@@ -1,5 +1,4 @@
 export class TokenPayload {
   user_id: string;
+  token_id: string;
 }
-
-export type RefreshTokenPayload = TokenPayload & { token_id: string };

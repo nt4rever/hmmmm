@@ -4,6 +4,7 @@ import { HydratedDocument } from 'mongoose';
 import { RefreshToken, RefreshTokenSchema } from './refresh-token.entity';
 import { Exclude, Type } from 'class-transformer';
 import { ApiHideProperty } from '@nestjs/swagger';
+import { VotePerDay, VotePerDaySchema } from './vote-per-day.entity';
 
 export enum GENDER {
   Male = 'MALE',
@@ -36,7 +37,7 @@ export class User extends BaseEntity {
     maxlength: 60,
     set: (value: string) => value.trim(),
   })
-  first_name: string;
+  first_name?: string;
 
   @Prop({
     required: true,
@@ -57,32 +58,30 @@ export class User extends BaseEntity {
     minlength: 1,
     maxlength: 15,
   })
-  phone_number: string;
+  phone_number?: string;
 
   @Exclude()
   @ApiHideProperty()
-  @Prop({
-    required: true,
-  })
-  password: string;
+  @Prop()
+  password?: string;
 
   @Prop({
     default: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png',
   })
-  avatar: string;
+  avatar?: string;
 
   @Prop()
-  date_of_birth: Date;
+  date_of_birth?: Date;
 
   @Prop({
     enum: GENDER,
   })
-  gender: GENDER;
+  gender?: GENDER;
 
   @Prop({
     default: true,
   })
-  isActive: boolean;
+  is_active: boolean;
 
   @Exclude()
   @ApiHideProperty()
@@ -101,6 +100,12 @@ export class User extends BaseEntity {
     default: ROLES.User,
   })
   role: ROLES;
+
+  @Prop()
+  address?: string;
+
+  @Prop({ type: VotePerDaySchema, default: () => ({}) })
+  vote_per_day?: VotePerDay;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

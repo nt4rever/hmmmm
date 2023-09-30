@@ -12,7 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import mongoose from 'mongoose';
 import { SignUpDto } from './dto';
-import { RefreshTokenPayload, TokenPayload } from './interfaces';
+import { TokenPayload } from './interfaces';
 
 @Injectable()
 export class AuthService {
@@ -51,11 +51,12 @@ export class AuthService {
       );
       const accessToken = this.generateAccessToken({
         user_id: user._id.toString(),
+        token_id: refreshToken.tokenId,
       });
 
       return {
         accessToken,
-        refreshToken,
+        refreshToken: refreshToken.token,
       };
     } catch (error) {
       throw error;
@@ -66,7 +67,7 @@ export class AuthService {
     try {
       const user = await this.usersService.findOneByCondition({
         email,
-        isActive: true,
+        is_active: true,
       });
       if (!user) throw new UnauthorizedException();
       await this.verifyPlainContentWithHashedContent(password, user.password);
@@ -82,11 +83,12 @@ export class AuthService {
       const refreshToken = await this.storeRefreshToken(userId);
       const accessToken = this.generateAccessToken({
         user_id: userId,
+        token_id: refreshToken.tokenId,
       });
 
       return {
         accessToken,
-        refreshToken,
+        refreshToken: refreshToken.token,
       };
     } catch (error) {
       throw error;
@@ -101,7 +103,7 @@ export class AuthService {
     try {
       const user = await this.usersService.findOneByCondition({
         _id: userId,
-        isActive: true,
+        is_active: true,
       });
       if (!user) {
         throw new UnauthorizedException(ERRORS_DICTIONARY.UNAUTHORIZED_EXCEPTION);
@@ -120,6 +122,14 @@ export class AuthService {
     }
   }
 
+  async logOut(userId: string, tokenId: string, allDevice?: boolean) {
+    try {
+      await this.usersService.removeAccessToken(userId, tokenId, allDevice);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   generateAccessToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
       privateKey: this.configService.get<string>('JWT_ACCESS_TOKEN_PRIVATE_KEY'),
@@ -128,7 +138,7 @@ export class AuthService {
     });
   }
 
-  generateRefreshToken(payload: RefreshTokenPayload) {
+  generateRefreshToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
       privateKey: this.configService.get<string>('JWT_REFRESH_TOKEN_PRIVATE_KEY'),
       expiresIn:
@@ -136,7 +146,10 @@ export class AuthService {
     });
   }
 
-  async storeRefreshToken(userId: string, device_name?: string): Promise<string> {
+  async storeRefreshToken(
+    userId: string,
+    device_name?: string,
+  ): Promise<{ token: string; tokenId: string }> {
     try {
       const tokenId = new mongoose.Types.ObjectId().toString();
       const token = this.generateRefreshToken({
@@ -150,7 +163,7 @@ export class AuthService {
         device_name,
       });
 
-      return token;
+      return { token, tokenId };
     } catch (error) {
       throw error;
     }
