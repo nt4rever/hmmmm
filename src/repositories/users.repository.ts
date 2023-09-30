@@ -38,19 +38,24 @@ export class UsersRepository
     }
   }
 
-  async removeRefreshToken(userId: string, id: string) {
+  async removeRefreshToken(userId: string, id: string, allDevice = false) {
     try {
+      const removeCondition = allDevice
+        ? {
+            refresh_token: [],
+          }
+        : {
+            $pull: {
+              refresh_token: {
+                _id: id,
+              },
+            },
+          };
       return await this.userModel.findOneAndUpdate(
         {
           _id: userId,
         },
-        {
-          $pull: {
-            refresh_token: {
-              _id: id,
-            },
-          },
-        },
+        removeCondition,
       );
     } catch (error) {
       throw error;

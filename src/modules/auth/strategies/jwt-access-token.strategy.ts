@@ -5,6 +5,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { TokenPayload } from '../interfaces';
 import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
@@ -16,17 +17,19 @@ export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: true,
       secretOrKey: configService.get<string>('JWT_ACCESS_TOKEN_PRIVATE_KEY'),
+      passReqToCallback: true,
     });
   }
 
-  async validate(payload: TokenPayload) {
+  async validate(request: Request, payload: TokenPayload) {
     const user = await this.userService.findOneByCondition({
       _id: payload.user_id,
-      isActive: true,
+      is_active: true,
     });
 
     if (!user) throw new UnauthorizedException(ERRORS_DICTIONARY.UNAUTHORIZED_EXCEPTION);
-
+    // Set current refresh token id into request
+    request['tokenId'] = payload.token_id;
     return user;
   }
 }

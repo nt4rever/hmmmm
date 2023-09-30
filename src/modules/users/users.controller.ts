@@ -14,7 +14,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
 import { CreateUserDto } from './dto';
 import { GENDER, ROLES, User } from './entities';
@@ -47,6 +47,13 @@ export class UsersController {
       },
     },
   })
+  @ApiOperation({
+    summary: 'Admin create new user',
+    description: `
+* Only admin can use this API
+
+* Admin create user and give some specific information`,
+  })
   create(@Body() dto: CreateUserDto) {
     return this.usersService.create(dto);
   }
@@ -59,5 +66,12 @@ export class UsersController {
   @Get(':id')
   find(@Param('id', ParseMongoIdPipe) id: string) {
     return this.usersService.findOne(id);
+  }
+
+  @Roles(ROLES.Admin)
+  @UseGuards(RolesGuard)
+  @Get()
+  all() {
+    return this.usersService.findAll();
   }
 }

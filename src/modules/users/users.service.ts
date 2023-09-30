@@ -19,4 +19,12 @@ export class UsersService extends BaseServiceAbstract<User> {
       throw error;
     }
   }
+
+  async removeAccessToken(userId: string, tokenId: string, allDevice = false) {
+    try {
+      await this.usersRepository.removeRefreshToken(userId, tokenId, allDevice);
+    } catch (error) {
+      throw error;
+    }
+  }
 }

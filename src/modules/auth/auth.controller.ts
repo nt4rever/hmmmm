@@ -5,9 +5,12 @@ import { GENDER } from '@modules/users/entities';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  ParseBoolPipe,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -17,6 +20,7 @@ import {
   ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -25,6 +29,7 @@ import { AuthService } from './auth.service';
 import { SignUpDto } from './dto';
 import { JwtRefreshTokenGuard } from './guards/jwt-refresh-token.guard';
 import { LocalAuthGuard } from './guards/local.guard';
+import { JwtAccessTokenGuard } from './guards/jwt-access-token.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -65,8 +70,8 @@ export class AuthController {
           created_user: {
             summary: 'Response after sign up',
             value: {
-              access_token: 'token',
-              refresh_token: 'token',
+              accessToken: 'token',
+              refreshToken: 'token',
             },
           },
         },
@@ -143,8 +148,8 @@ export class AuthController {
     content: {
       'application/json': {
         example: {
-          access_token: 'token',
-          refresh_token: 'token',
+          accessToken: 'token',
+          refreshToken: 'token',
         },
       },
     },
@@ -175,7 +180,7 @@ export class AuthController {
     content: {
       'application/json': {
         example: {
-          access_token: 'token',
+          accessToken: 'token',
         },
       },
     },
@@ -192,12 +197,32 @@ export class AuthController {
     },
   })
   async refreshAccessToken(@Req() request: RequestWithUser) {
-    const { user } = request;
-    const access_token = this.authService.generateAccessToken({
-      user_id: user._id.toString(),
+    const accessToken = this.authService.generateAccessToken({
+      user_id: request.user._id.toString(),
+      token_id: request['tokenId'],
     });
     return {
-      access_token,
+      accessToken,
     };
+  }
+
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth('token')
+  @ApiQuery({
+    name: 'all_device',
+    type: Boolean,
+    required: false,
+  })
+  async logOut(
+    @Req() request: RequestWithUser,
+    @Query('all_device', new ParseBoolPipe({ optional: true })) allDevice?: boolean,
+  ) {
+    await this.authService.logOut(
+      request.user._id.toString(),
+      request['tokenId'],
+      allDevice,
+    );
   }
 }

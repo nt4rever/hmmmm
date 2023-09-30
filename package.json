@@ -23,7 +23,8 @@
     "docker:stop": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml stop",
     "docker:down": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml down",
     "docker:build": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml build",
-    "docker:config": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml config"
+    "docker:config": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml config",
+    "docker:log": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml logs --follow"
   },
   "dependencies": {
     "@faker-js/faker": "^8.1.0",
