@@ -24,6 +24,7 @@ export class SignUpDto {
   email: string;
 
   @IsOptional()
+  @MaxLength(15)
   phone_number?: string;
 
   @IsNotEmpty()
