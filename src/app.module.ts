@@ -10,6 +10,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GlobalExceptionFilter } from './exception-filters/global-exception.filter';
 import { AwsModule } from '@modules/aws/aws.module';
 import * as Joi from 'joi';
+import { AreasModule } from '@modules/areas/areas.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import * as Joi from 'joi';
     UsersModule,
     AuthModule,
     AwsModule,
+    AreasModule,
   ],
   controllers: [],
   providers: [
