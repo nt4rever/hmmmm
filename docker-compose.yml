@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  hmmmm_api_dev:
-    container_name: hmmmm_api_dev
+  hmmmm_api:
+    container_name: hmmmm_api
     image: registry.gitlab.com/levantanald/hmmmm:latest
     env_file: .env
     environment:
