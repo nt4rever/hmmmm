@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GlobalExceptionFilter } from './exception-filters/global-exception.filter';
+import { AwsModule } from '@modules/aws/aws.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { GlobalExceptionFilter } from './exception-filters/global-exception.filt
     }),
     UsersModule,
     AuthModule,
+    AwsModule,
   ],
   controllers: [],
   providers: [

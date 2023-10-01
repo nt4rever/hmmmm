@@ -27,6 +27,8 @@
     "docker:log": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml logs --follow"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.421.0",
+    "@aws-sdk/lib-storage": "^3.421.0",
     "@faker-js/faker": "^8.1.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
@@ -55,6 +57,7 @@
     "@nestjs/testing": "^10.0.0",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
+    "@types/morgan": "^1.9.6",
     "@types/multer": "^1.4.7",
     "@types/node": "^20.3.1",
     "@types/passport-jwt": "^3.0.10",

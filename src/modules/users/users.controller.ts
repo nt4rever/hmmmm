@@ -1,4 +1,5 @@
 import { RequestWithUser } from '@custom-types/requests.type';
+import { ApiImageFile } from '@decorators/api-file.decorator';
 import { Roles } from '@decorators/roles.decorator';
 import { faker } from '@faker-js/faker';
 import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
@@ -11,10 +12,12 @@ import {
   Param,
   Post,
   Req,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ParseFilePipe } from '@pipes/parse-file.pipe';
 import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
 import { CreateUserDto } from './dto';
 import { GENDER, ROLES, User } from './entities';
@@ -73,5 +76,14 @@ export class UsersController {
   @Get()
   all() {
     return this.usersService.findAll();
+  }
+
+  @Post('avatar')
+  @ApiImageFile('avatar', true)
+  async uploadAvatar(
+    @UploadedFile(ParseFilePipe) avatar: Express.Multer.File,
+    @Req() { user }: RequestWithUser,
+  ) {
+    return await this.usersService.uploadAvatar(user, avatar);
   }
 }
