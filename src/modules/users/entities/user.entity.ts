@@ -1,9 +1,9 @@
 import { BaseEntity } from '@modules/shared/base';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiHideProperty } from '@nestjs/swagger';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { HydratedDocument } from 'mongoose';
 import { RefreshToken, RefreshTokenSchema } from './refresh-token.entity';
-import { Exclude, Type } from 'class-transformer';
-import { ApiHideProperty } from '@nestjs/swagger';
 import { VotePerDay, VotePerDaySchema } from './vote-per-day.entity';
 
 export enum GENDER {
@@ -65,10 +65,15 @@ export class User extends BaseEntity {
   @Prop()
   password?: string;
 
-  @Prop({
-    default: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png',
-  })
+  @Prop()
   avatar?: string;
+
+  @Expose({ name: 'avatar_url' })
+  get getAvatar(): string {
+    return this.avatar
+      ? `${process.env.AWS_ENDPOINT}/${process.env.AWS_S3_BUCKET}/${this.avatar}`
+      : 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png';
+  }
 
   @Prop()
   date_of_birth?: Date;
