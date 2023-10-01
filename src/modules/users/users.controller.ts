@@ -10,6 +10,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UploadedFile,
@@ -19,7 +20,7 @@ import {
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ParseFilePipe } from '@pipes/parse-file.pipe';
 import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
-import { CreateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { GENDER, ROLES, User } from './entities';
 import { UsersService } from './users.service';
 
@@ -43,25 +44,29 @@ export class UsersController {
           last_name: faker.person.lastName(),
           email: faker.internet.email(),
           phone_number: '+84xxxxxxxxx',
-          date_of_birth: faker.date.birthdate(),
+          date_of_birth: new Date('2001-02-14'),
           password: 'password',
           gender: GENDER.Male,
+          role: ROLES.Volunteer,
         } as CreateUserDto,
       },
     },
   })
   @ApiOperation({
-    summary: 'Admin create new user',
+    summary: 'Admin, Area Manager create new user',
     description: `
-* Only admin can use this API
+* Only admin and area manager can use this API
 
 * Admin create user and give some specific information`,
   })
-  create(@Body() dto: CreateUserDto) {
-    return this.usersService.create(dto);
+  create(@Body() dto: CreateUserDto, @Req() { user }: RequestWithUser) {
+    return this.usersService.createUser(user, dto);
   }
 
   @Get('/me')
+  @ApiOperation({
+    summary: 'Get profile current user',
+  })
   me(@Req() { user }: RequestWithUser) {
     return user;
   }
@@ -80,10 +85,21 @@ export class UsersController {
 
   @Post('avatar')
   @ApiImageFile('avatar', true)
+  @ApiOperation({
+    summary: 'Update avatar current user',
+  })
   async uploadAvatar(
     @UploadedFile(ParseFilePipe) avatar: Express.Multer.File,
     @Req() { user }: RequestWithUser,
   ) {
     return await this.usersService.uploadAvatar(user, avatar);
+  }
+
+  @Patch('profile')
+  @ApiOperation({
+    summary: 'Update profile current user',
+  })
+  async updateProfile(@Body() dto: UpdateUserDto, @Req() { user }: RequestWithUser) {
+    return await this.usersService.update(user._id.toString(), dto);
   }
 }

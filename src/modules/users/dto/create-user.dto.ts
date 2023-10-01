@@ -7,7 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { GENDER } from '../entities';
+import { GENDER, ROLES } from '../entities';
 
 export class CreateUserDto {
   @IsOptional()
@@ -24,6 +24,7 @@ export class CreateUserDto {
   email: string;
 
   @IsOptional()
+  @MaxLength(15)
   phone_number?: string;
 
   @IsOptional()
@@ -38,4 +39,12 @@ export class CreateUserDto {
   @IsOptional()
   @IsEnum(GENDER)
   gender?: GENDER;
+
+  @IsOptional()
+  @MaxLength(50)
+  address?: string;
+
+  @IsOptional()
+  @IsEnum(ROLES)
+  role?: ROLES;
 }
