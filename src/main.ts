@@ -22,7 +22,7 @@ async function bootstrap() {
     !configService.get('SWAGGER_ENABLE') ||
     configService.get('SWAGGER_ENABLE') === '1'
   ) {
-    configSwagger(app);
+    await configSwagger(app);
   }
 
   await app.listen(configService.get('PORT') || 8000, () => {

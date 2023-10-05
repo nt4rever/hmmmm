@@ -34,7 +34,6 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-src/metadata.ts
 mongo-data
 .env
 .env.dev
