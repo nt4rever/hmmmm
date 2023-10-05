@@ -1,8 +1,8 @@
+import { fileMimetypeFilter } from '@filters/file-minetype.filter';
 import { UseInterceptors, applyDecorators } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
-import { fileMimetypeFilter } from 'src/filters/file-minetype.filter';
 
 export function ApiFile(
   filedName: string = 'file',

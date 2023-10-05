@@ -2,8 +2,8 @@ import { configSwagger } from '@configs/api-docs.config';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import * as morgan from 'morgan';
 import { AppModule } from './app.module';
+import morgan from 'morgan';
 
 async function bootstrap() {
   const logger = new Logger(bootstrap.name);
