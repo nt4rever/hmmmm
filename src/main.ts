@@ -25,12 +25,8 @@ async function bootstrap() {
     configSwagger(app);
   }
 
-  await app.listen(configService.get('PORT') || 8000, () => {
-    logger.log(
-      `Application running on port http://localhost:${
-        configService.get('PORT') || 8000
-      }/api-docs`,
-    );
+  await app.listen(configService.get('PORT') || 8000, async () => {
+    logger.log(`Application running on ${await app.getUrl()}/api-docs`);
   });
 }
 bootstrap();

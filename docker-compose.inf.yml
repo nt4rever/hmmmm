@@ -1,0 +1,33 @@
+# Set up infrastructure on windows
+
+version: '3.8'
+
+services:
+  hmmmm_mongodb:
+    container_name: hmmmm_mongodb
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+    expose:
+      - ${DATABASE_PORT}
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    volumes:
+      - mongo_db_data:/data/db
+    restart: unless-stopped
+  hmmmm_redis:
+    container_name: hmmmm_redis
+    image: redis:alpine
+    expose:
+      - ${REDIS_PORT}
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge
+volumes:
+  mongo_db_data:
+    driver: local
