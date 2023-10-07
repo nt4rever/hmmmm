@@ -22,6 +22,25 @@ export class Area extends BaseEntity {
   address: string;
 
   @Prop({
+    required: true,
+    min: -90,
+    max: 90,
+  })
+  lat: number;
+
+  @Prop({
+    required: true,
+    min: -180,
+    max: 180,
+  })
+  lng: number;
+
+  @Prop({
+    default: 1000,
+  })
+  radius: number;
+
+  @Prop({
     default: true,
   })
   is_active: boolean;

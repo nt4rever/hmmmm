@@ -12,6 +12,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
+      transform: true,
     }),
   );
   app.setGlobalPrefix(configService.get('API_PREFIX'));

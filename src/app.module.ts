@@ -7,7 +7,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
-import { GlobalExceptionFilter } from './exception-filters/global-exception.filter';
+import { GlobalExceptionFilter } from '@exception-filters/global-exception.filter';
 import { AwsModule } from '@modules/aws/aws.module';
 import * as Joi from 'joi';
 import { AreasModule } from '@modules/areas/areas.module';

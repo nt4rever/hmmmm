@@ -1,3 +1,4 @@
+import { ApiFindAllResponse } from '@decorators/api-find-all.decorator';
 import { Public } from '@decorators/auth.decorator';
 import { Roles } from '@decorators/roles.decorator';
 import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
@@ -13,11 +14,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
+import { ParseFieldsPipe } from '@pipes/parse-fields.pipe';
 import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
+import { MONGO_ORDER } from '@repositories/constants/order';
 import { AreasService } from './areas.service';
 import { CreateAreaDto, UpdateAreaDto } from './dto';
 import { Area } from './entities';
@@ -32,15 +36,38 @@ export class AreasController {
 
   @Get()
   @Public()
-  async all() {
-    return await this.areasService.findAll({
-      is_active: true,
-    });
+  @ApiFindAllResponse(Area)
+  async all(@Query('select', ParseFieldsPipe) projection: string | object) {
+    return await this.areasService.findAll(
+      {
+        is_active: true,
+      },
+      projection,
+      {
+        sort: {
+          name: MONGO_ORDER.ASC,
+        },
+      },
+    );
   }
 
   @Post()
   @Roles(ROLES.Admin)
   @UseGuards(RolesGuard)
+  @ApiBody({
+    type: CreateAreaDto,
+    examples: {
+      area_1: {
+        value: {
+          name: 'VKU University',
+          address: '484 ĐT607, Điện Ngọc, Điện Bàn, Đà Nẵng 550000, Vietnam',
+          lat: 15.974597,
+          lng: 108.254675,
+          radius: 2000,
+        },
+      },
+    },
+  })
   async create(@Body() dto: CreateAreaDto) {
     return await this.areasService.create(dto);
   }
@@ -49,6 +76,7 @@ export class AreasController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Roles(ROLES.Admin)
   @UseGuards(RolesGuard)
+  @ApiNoContentResponse()
   async update(@Body() dto: UpdateAreaDto, @Param('id', ParseMongoIdPipe) id: string) {
     return await this.areasService.update(id, dto);
   }

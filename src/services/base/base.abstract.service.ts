@@ -12,8 +12,12 @@ export abstract class BaseServiceAbstract<T extends BaseEntity>
     return await this.repository.create(createDto);
   }
 
-  async findAll(filter?: object, options?: object): Promise<FindAllResponse<T>> {
-    return await this.repository.findAll(filter, options);
+  async findAll(
+    filter?: object,
+    projection?: string | object,
+    options?: object,
+  ): Promise<FindAllResponse<T>> {
+    return await this.repository.findAll(filter, projection, options);
   }
 
   async findOne(id: string) {
