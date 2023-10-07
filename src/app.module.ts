@@ -11,6 +11,7 @@ import { GlobalExceptionFilter } from '@exception-filters/global-exception.filte
 import { AwsModule } from '@modules/aws/aws.module';
 import * as Joi from 'joi';
 import { AreasModule } from '@modules/areas/areas.module';
+import { UserAreasModule } from '@modules/user-areas/user-areas.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { AreasModule } from '@modules/areas/areas.module';
     AuthModule,
     AwsModule,
     AreasModule,
+    UserAreasModule,
   ],
   controllers: [],
   providers: [

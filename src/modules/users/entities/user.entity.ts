@@ -1,6 +1,6 @@
 import { BaseEntity } from '@modules/shared/base';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiHideProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { HydratedDocument } from 'mongoose';
 import { RefreshToken, RefreshTokenSchema } from './refresh-token.entity';
@@ -68,8 +68,11 @@ export class User extends BaseEntity {
   @Prop()
   avatar?: string;
 
+  @ApiProperty({
+    type: String,
+  })
   @Expose({ name: 'avatar_url' })
-  get getAvatar(): string {
+  get avatar_url(): string {
     return this.avatar
       ? `${process.env.AWS_ENDPOINT}/${process.env.AWS_S3_BUCKET}/${this.avatar}`
       : 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png';

@@ -68,6 +68,7 @@ export class AreasController {
       },
     },
   })
+  @ApiNoContentResponse()
   async create(@Body() dto: CreateAreaDto) {
     return await this.areasService.create(dto);
   }
