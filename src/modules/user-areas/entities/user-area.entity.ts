@@ -16,21 +16,19 @@ export type UserAreaDocument = HydratedDocument<UserArea>;
 })
 export class UserArea extends BaseEntity {
   @Prop({
-    required: true,
     min: -90,
     max: 90,
   })
   lat: number;
 
   @Prop({
-    required: true,
     min: -180,
     max: 180,
   })
   lng: number;
 
   @Prop({
-    default: 1000,
+    required: false,
   })
   radius: number;
 

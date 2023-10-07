@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsNumber, Max, MaxLength, Min } from 'class-validator';
+import {
+  IsLatitude,
+  IsLongitude,
+  IsNotEmpty,
+  IsNumber,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateAreaDto {
   @IsNotEmpty()
@@ -10,15 +18,11 @@ export class CreateAreaDto {
   address: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  @Min(-90)
-  @Max(90)
+  @IsLatitude()
   lat: number;
 
   @IsNotEmpty()
-  @IsNumber()
-  @Min(-180)
-  @Max(180)
+  @IsLongitude()
   lng: number;
 
   @IsNotEmpty()

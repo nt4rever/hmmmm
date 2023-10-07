@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserAreasService } from './user-areas.service';
-import { UserAreasController } from './user-areas.controller';
+// import { UserAreasController } from './user-areas.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserArea, UserAreaSchema } from './entities';
 import { UserAreasRepository } from '@repositories/user-areas.repository';
@@ -14,7 +14,7 @@ import { UserAreasRepository } from '@repositories/user-areas.repository';
       },
     ]),
   ],
-  controllers: [UserAreasController],
+  // controllers: [UserAreasController],
   providers: [
     UserAreasService,
     {
@@ -22,5 +22,6 @@ import { UserAreasRepository } from '@repositories/user-areas.repository';
       useClass: UserAreasRepository,
     },
   ],
+  exports: [UserAreasService],
 })
 export class UserAreasModule {}
