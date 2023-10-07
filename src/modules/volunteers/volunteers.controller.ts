@@ -1,8 +1,10 @@
 import { RequestWithUser } from '@custom-types/requests.type';
+import { ApiFindAllResponse } from '@decorators/api-find-all.decorator';
 import { Roles } from '@decorators/roles.decorator';
 import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
+import { UserAreasService } from '@modules/user-areas/user-areas.service';
 import { ROLES, User } from '@modules/users/entities';
 import {
   Body,
@@ -21,17 +23,19 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { ParseFieldsPipe } from '@pipes/parse-fields.pipe';
 import { CreateVolunteerDto } from './dto';
 import { VolunteersService } from './volunteers.service';
-import { ApiFindAllResponse } from '@decorators/api-find-all.decorator';
-import { ParseFieldsPipe } from '@pipes/parse-fields.pipe';
 
 @ApiTags('volunteers')
 @ApiBearerAuth('token')
 @Controller('volunteers')
 @UseGuards(JwtAccessTokenGuard)
 export class VolunteersController {
-  constructor(private readonly volunteersService: VolunteersService) {}
+  constructor(
+    private readonly volunteersService: VolunteersService,
+    private readonly userAreasService: UserAreasService,
+  ) {}
 
   @Post('manager')
   @ApiOperation({
@@ -41,7 +45,7 @@ export class VolunteersController {
   @UseGuards(RolesGuard)
   @ApiNoContentResponse()
   async create(@Body() dto: CreateVolunteerDto) {
-    await this.volunteersService.create(dto);
+    await this.userAreasService.createUser(dto, ROLES.Volunteer);
   }
 
   @Get('manager')

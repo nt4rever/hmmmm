@@ -13,6 +13,7 @@ import * as Joi from 'joi';
 import { AreasModule } from '@modules/areas/areas.module';
 import { UserAreasModule } from '@modules/user-areas/user-areas.module';
 import { VolunteersModule } from '@modules/volunteers/volunteers.module';
+import { ManagersModule } from '@modules/managers/managers.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { VolunteersModule } from '@modules/volunteers/volunteers.module';
     AreasModule,
     UserAreasModule,
     VolunteersModule,
+    ManagersModule,
   ],
   controllers: [],
   providers: [
