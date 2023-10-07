@@ -13,10 +13,13 @@ export class MongoExceptionFilter implements ExceptionFilter {
 
     const statusCode = HttpStatus.UNPROCESSABLE_ENTITY;
     let message = 'Internal server error';
+
     switch (exception.code) {
       case 11000:
         message = ERRORS_DICTIONARY.DB_RECORD_DUPLICATE;
         break;
+      case 31254:
+        message = ERRORS_DICTIONARY.DB_QUERY_FAIL;
     }
 
     response.status(HttpStatus.UNPROCESSABLE_ENTITY).json({

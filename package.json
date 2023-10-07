@@ -19,12 +19,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "docker:dev": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml up -d",
-    "docker:stop": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml stop",
-    "docker:down": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml down",
-    "docker:build": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml build",
-    "docker:config": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml config",
-    "docker:log": "docker compose --env-file ./.env.dev -f docker-compose.dev.yml logs --follow"
+    "docker:dev": "docker compose --env-file ./.env.dev -f docker-compose.inf.yml up -d",
+    "docker:stop": "docker compose --env-file ./.env.dev -f docker-compose.inf.yml stop",
+    "docker:down": "docker compose --env-file ./.env.dev -f docker-compose.inf.yml down",
+    "docker:build": "docker compose --env-file ./.env.dev -f docker-compose.inf.yml build",
+    "docker:config": "docker compose --env-file ./.env.dev -f docker-compose.inf.yml config",
+    "docker:log": "docker compose --env-file ./.env.dev -f docker-compose.inf.yml logs --f"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.421.0",
