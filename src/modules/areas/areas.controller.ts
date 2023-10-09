@@ -1,17 +1,13 @@
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import { RequestWithUser } from '@custom-types/requests.type';
 import { ApiFindAllResponse } from '@decorators/api-find-all.decorator';
 import { Public } from '@decorators/auth.decorator';
 import { Roles } from '@decorators/roles.decorator';
 import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
-import { UserAreasService } from '@modules/user-areas/user-areas.service';
 import { ROLES } from '@modules/users/entities';
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -19,7 +15,6 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -43,10 +38,7 @@ import { Area } from './entities';
 @UseInterceptors(MongooseClassSerializerInterceptor(Area))
 @UseGuards(JwtAccessTokenGuard)
 export class AreasController {
-  constructor(
-    private readonly areasService: AreasService,
-    private readonly userAreasService: UserAreasService,
-  ) {}
+  constructor(private readonly areasService: AreasService) {}
 
   @Get()
   @ApiOperation({
@@ -95,27 +87,13 @@ export class AreasController {
 
   @Patch(':id')
   @ApiOperation({
-    summary: 'Admin and area manager owner update area',
+    summary: 'Admin update area',
   })
   @ApiNoContentResponse()
   @HttpCode(HttpStatus.NO_CONTENT)
   @Roles(ROLES.Admin, ROLES.AreaManager)
   @UseGuards(RolesGuard)
-  async update(
-    @Body() dto: UpdateAreaDto,
-    @Param('id', ParseMongoIdPipe) id: string,
-    @Req() { user }: RequestWithUser,
-  ) {
-    if (user.role === ROLES.AreaManager) {
-      const userArea = this.userAreasService.findOneByCondition({
-        _id: id,
-        user: user,
-      });
-      if (!userArea) {
-        throw new ForbiddenException(ERRORS_DICTIONARY.FORBIDDEN);
-      }
-      delete dto.is_active;
-    }
+  async update(@Body() dto: UpdateAreaDto, @Param('id', ParseMongoIdPipe) id: string) {
     await this.areasService.update(id, dto);
   }
 }

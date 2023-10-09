@@ -1,4 +1,3 @@
-import { UserAreasModule } from '@modules/user-areas/user-areas.module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AreasRepository } from '@repositories/areas.repository';
@@ -14,7 +13,6 @@ import { Area, AreaSchema } from './entities';
         schema: AreaSchema,
       },
     ]),
-    UserAreasModule,
   ],
   controllers: [AreasController],
   providers: [
