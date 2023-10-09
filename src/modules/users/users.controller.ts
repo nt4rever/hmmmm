@@ -100,6 +100,6 @@ export class UsersController {
     summary: 'Update profile current user',
   })
   async updateProfile(@Body() dto: UpdateUserDto, @Req() { user }: RequestWithUser) {
-    return await this.usersService.update(user._id.toString(), dto);
+    return await this.usersService.update(user.id, dto);
   }
 }

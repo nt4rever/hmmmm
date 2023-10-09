@@ -1,21 +1,27 @@
-import { FindAllResponse } from '@custom-types/common.type';
+import {
+  IDatabaseFindAllOptions,
+  IDatabaseFindOneOptions,
+} from '@modules/shared/interfaces/database.interface';
+import { ClientSession } from 'mongoose';
 
 export interface BaseRepositoryInterface<T> {
   create(dto: T | any): Promise<T>;
 
-  findOneById(id: string, projection?: string): Promise<T>;
+  findOneById(_id: string, options?: IDatabaseFindOneOptions<ClientSession>): Promise<T>;
 
-  findOneByCondition(condition?: object, projection?: string): Promise<T>;
+  findOneByCondition(
+    find: Record<string, any>,
+    options?: IDatabaseFindOneOptions<ClientSession>,
+  ): Promise<T>;
 
   findAll(
-    condition: object,
-    projection?: string | object,
-    options?: object,
-  ): Promise<FindAllResponse<T>>;
+    find?: Record<string, any>,
+    options?: IDatabaseFindAllOptions<ClientSession>,
+  ): Promise<T[]>;
 
-  update(id: string, dto: Partial<T>): Promise<T>;
+  update(_id: string, dto: Partial<T>): Promise<T>;
 
-  softDelete(id: string): Promise<boolean>;
+  softDelete(_id: string): Promise<boolean>;
 
-  permanentlyDelete(id: string): Promise<boolean>;
+  permanentlyDelete(_id: string): Promise<boolean>;
 }

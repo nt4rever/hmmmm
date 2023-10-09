@@ -167,7 +167,7 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   async signIn(@Req() request: RequestWithUser) {
-    return await this.authService.signIn(request.user._id.toString());
+    return await this.authService.signIn(request.user.id);
   }
 
   @UseGuards(JwtRefreshTokenGuard)
@@ -198,7 +198,7 @@ export class AuthController {
   })
   async refreshAccessToken(@Req() request: RequestWithUser) {
     const accessToken = this.authService.generateAccessToken({
-      user_id: request.user._id.toString(),
+      user_id: request.user.id,
       token_id: request['tokenId'],
     });
     return {
@@ -219,10 +219,6 @@ export class AuthController {
     @Req() request: RequestWithUser,
     @Query('all_device', new ParseBoolPipe({ optional: true })) allDevice?: boolean,
   ) {
-    await this.authService.logOut(
-      request.user._id.toString(),
-      request['tokenId'],
-      allDevice,
-    );
+    await this.authService.logOut(request.user.id, request['tokenId'], allDevice);
   }
 }

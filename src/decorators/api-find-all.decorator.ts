@@ -1,35 +1,19 @@
-import { Type, applyDecorators } from '@nestjs/common';
-import { ApiOkResponse, ApiQuery, getSchemaPath } from '@nestjs/swagger';
+import { applyDecorators } from '@nestjs/common';
+import { ApiQuery } from '@nestjs/swagger';
 
-export function ApiFindAllResponse(model: Type, queryExample: string = 'name|address') {
+export function ApiFindAllResponse(select = 'name|address', order = 'name|asc') {
   return applyDecorators(
     ApiQuery({
       name: 'select',
       type: 'string',
       required: false,
-      example: queryExample,
+      example: select,
     }),
-    ApiOkResponse({
-      schema: {
-        allOf: [
-          {
-            properties: {
-              count: {
-                type: 'number',
-                example: 10,
-              },
-            },
-          },
-          {
-            properties: {
-              items: {
-                type: 'array',
-                items: { $ref: getSchemaPath(model) },
-              },
-            },
-          },
-        ],
-      },
+    ApiQuery({
+      name: 'order',
+      type: 'string',
+      required: false,
+      example: order,
     }),
   );
 }

@@ -1,6 +1,9 @@
-import { FindAllResponse } from '@custom-types/common.type';
 import { BaseEntity } from '@modules/shared/base';
-import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import {
+  IDatabaseFindAllOptions,
+  IDatabaseFindOneOptions,
+} from '@modules/shared/interfaces/database.interface';
+import { ClientSession, Model, PopulateOptions } from 'mongoose';
 import { BaseRepositoryInterface } from './base.interface.repository';
 
 export abstract class BaseRepositoryAbstract<T extends BaseEntity>
@@ -13,58 +16,154 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     return createData;
   }
 
-  async findOneById(id: string): Promise<T> {
-    const item = await this.model.findById(id);
-    return item.deleted_at ? null : item;
+  async findOneById(
+    _id: string,
+    options?: IDatabaseFindOneOptions<ClientSession>,
+  ): Promise<T> {
+    const findOne = this.model.findById(_id);
+
+    if (options?.withDeleted) {
+      findOne.or([
+        {
+          deleted_at: { $exists: false },
+        },
+        {
+          deleted_at: { $exists: true },
+        },
+      ]);
+    } else {
+      findOne.where('deleted_at').exists(false);
+    }
+
+    if (options?.select) {
+      findOne.select(options.select);
+    }
+
+    if (options?.select) {
+      findOne.select(options.select);
+    }
+
+    if (options?.join) {
+      findOne.populate(options.join as PopulateOptions | PopulateOptions[]);
+    }
+
+    if (options?.session) {
+      findOne.session(options.session);
+    }
+
+    if (options?.order) {
+      findOne.sort(options.order);
+    }
+
+    return findOne.exec() as any;
   }
 
-  async findOneByCondition(condition: object): Promise<T> {
-    return await this.model
-      .findOne({
-        deleted_at: null,
-        ...condition,
-      })
-      .exec();
+  async findOneByCondition(
+    find: Record<string, any>,
+    options?: IDatabaseFindOneOptions<ClientSession>,
+  ): Promise<T> {
+    const findOne = this.model.findOne(find);
+
+    if (options?.withDeleted) {
+      findOne.or([
+        {
+          deleted_at: { $exists: false },
+        },
+        {
+          deleted_at: { $exists: true },
+        },
+      ]);
+    } else {
+      findOne.where('deleted_at').exists(false);
+    }
+
+    if (options?.select) {
+      findOne.select(options.select);
+    }
+
+    if (options?.select) {
+      findOne.select(options.select);
+    }
+
+    if (options?.join) {
+      findOne.populate(options.join as PopulateOptions | PopulateOptions[]);
+    }
+
+    if (options?.session) {
+      findOne.session(options.session);
+    }
+
+    if (options?.order) {
+      findOne.sort(options.order);
+    }
+
+    return findOne.exec() as any;
   }
 
   async findAll(
-    condition: FilterQuery<T>,
-    projection?: string,
-    options?: QueryOptions<T>,
-  ): Promise<FindAllResponse<T>> {
-    const [count, items] = await Promise.all([
-      this.model.count({ ...condition, deleted_at: null }),
-      this.model.find({ ...condition, deleted_at: null }, projection, options),
-    ]);
+    find?: Record<string, any>,
+    options?: IDatabaseFindAllOptions<ClientSession>,
+  ): Promise<T[]> {
+    const findAll = this.model.find(find);
 
-    return {
-      count,
-      items,
-    };
+    if (options?.withDeleted) {
+      findAll.or([
+        {
+          deleted_at: { $exists: false },
+        },
+        {
+          deleted_at: { $exists: true },
+        },
+      ]);
+    } else {
+      findAll.where('deleted_at').exists(false);
+    }
+
+    if (options?.select) {
+      findAll.select(options.select);
+    }
+
+    if (options?.paging) {
+      findAll.limit(options.paging.limit).skip(options.paging.offset);
+    }
+
+    if (options?.order) {
+      findAll.sort(options.order);
+    }
+
+    if (options?.join) {
+      findAll.populate(options.join as PopulateOptions | PopulateOptions[]);
+    }
+
+    if (options?.session) {
+      findAll.session(options.session);
+    }
+
+    return findAll.lean() as any;
   }
 
-  async update(id: string, dto: Partial<T>): Promise<T> {
-    return await this.model.findOneAndUpdate({ _id: id, deleted_at: null }, dto, {
+  async update(_id: string, dto: Partial<T>): Promise<T> {
+    return await this.model.findOneAndUpdate({ _id, deleted_at: null }, dto, {
       new: true,
     });
   }
 
-  async softDelete(id: string): Promise<boolean> {
-    const delete_item = await this.model.findById(id);
+  async softDelete(_id: string): Promise<boolean> {
+    const delete_item = await this.model.findById(_id);
     if (!delete_item) {
       return false;
     }
 
     return !!(await this.model
-      .findByIdAndUpdate<T>(id, { deleted_at: new Date() })
+      .findByIdAndUpdate<T>(_id, { deleted_at: new Date() })
       .exec());
   }
 
-  async permanentlyDelete(id: string): Promise<boolean> {
-    const delete_item = await this.model.findById(id);
+  async permanentlyDelete(_id: string): Promise<boolean> {
+    const delete_item = await this.model.findById(_id);
     if (!delete_item) {
       return false;
     }
-    return !!(await this.model.findByIdAndDelete(id));
+    return !!(await this.model.findByIdAndDelete(_id));
   }
 }

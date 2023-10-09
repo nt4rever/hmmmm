@@ -21,4 +21,9 @@ export enum ERRORS_DICTIONARY {
 
   // AREA
   AREA_NOT_FOUND = 'AREA_0041',
+
+  // COMMON
+  CREATE_FAIL = 'CM_001',
+  UPDATE_FAIL = 'CM_002',
+  DELETE_FAIL = 'CM_003',
 }

@@ -36,7 +36,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 
   async uploadAvatar(user: User, file: Express.Multer.File) {
     try {
-      const key = `avatars/${user._id.toString()}/${randomUUID()}.${file.originalname
+      const key = `avatars/${user.id}/${randomUUID()}.${file.originalname
         .split('.')
         .at(-1)}`;
 
@@ -46,7 +46,7 @@ export class UsersService extends BaseServiceAbstract<User> {
         this.awsService.deleteFile(user.avatar);
       }
 
-      return await this.usersRepository.update(user._id.toString(), {
+      return await this.usersRepository.update(user.id, {
         avatar: key,
       });
     } catch (error) {
