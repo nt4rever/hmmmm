@@ -4,10 +4,15 @@ import { isString } from 'class-validator';
 @Injectable()
 export class ParseFieldsPipe implements PipeTransform {
   transform(value: any) {
+    let fields: Record<string, any> = {};
     if (isString(value)) {
-      const arr = value.trim().split('|');
-      return arr.join(' ');
+      value
+        .trim()
+        .split('|')
+        .map((f) => {
+          fields = { ...fields, [f]: 1 };
+        });
     }
-    return {};
+    return fields;
   }
 }

@@ -1,7 +1,11 @@
 import { BaseEntity } from '@modules/shared/base';
-import { BaseServiceInterface } from './base.interface.service';
-import { FindAllResponse } from '@custom-types/common.type';
+import {
+  IDatabaseFindAllOptions,
+  IDatabaseFindOneOptions,
+} from '@modules/shared/interfaces/database.interface';
 import { BaseRepositoryInterface } from '@repositories/base';
+import { ClientSession } from 'mongoose';
+import { BaseServiceInterface } from './base.interface.service';
 
 export abstract class BaseServiceAbstract<T extends BaseEntity>
   implements BaseServiceInterface<T>
@@ -13,26 +17,28 @@ export abstract class BaseServiceAbstract<T extends BaseEntity>
   }
 
   async findAll(
-    filter?: object,
-    projection?: string | object,
-    options?: object,
-  ): Promise<FindAllResponse<T>> {
-    return await this.repository.findAll(filter, projection, options);
+    find?: Record<string, any>,
+    options?: IDatabaseFindAllOptions<ClientSession>,
+  ): Promise<T[]> {
+    return await this.repository.findAll(find, options);
   }
 
-  async findOne(id: string) {
-    return await this.repository.findOneById(id);
+  async findOne(_id: string, options?: IDatabaseFindOneOptions<ClientSession>) {
+    return await this.repository.findOneById(_id, options);
   }
 
-  async findOneByCondition(filter: Partial<object | T>) {
-    return await this.repository.findOneByCondition(filter);
+  async findOneByCondition(
+    find: Record<string, any>,
+    options?: IDatabaseFindOneOptions<ClientSession>,
+  ) {
+    return await this.repository.findOneByCondition(find, options);
   }
 
-  async update(id: string, updateDto: Partial<T>) {
-    return await this.repository.update(id, updateDto);
+  async update(_id: string, updateDto: Partial<T>) {
+    return await this.repository.update(_id, updateDto);
   }
 
-  async remove(id: string) {
-    return await this.repository.softDelete(id);
+  async remove(_id: string) {
+    return await this.repository.softDelete(_id);
   }
 }

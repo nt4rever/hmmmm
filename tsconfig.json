@@ -28,6 +28,8 @@
       "@interceptors/*": ["src/interceptors/*"],
       "@pipes/*": ["src/pipes/*"],
       "@decorators/*": ["src/decorators/*"],
+      "@utils/*": ["src/utils/*"],
+      "@common/*": ["src/common/*"]
     }
   }
 }

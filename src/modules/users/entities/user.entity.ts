@@ -1,8 +1,9 @@
-import { BaseEntity } from '@modules/shared/base';
+import { Area } from '@modules/areas/entities';
+import { BaseEntity, Location, LocationSchema } from '@modules/shared/base';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, Type } from 'class-transformer';
-import { HydratedDocument } from 'mongoose';
+import { ApiHideProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
+import mongoose, { HydratedDocument } from 'mongoose';
 import { RefreshToken, RefreshTokenSchema } from './refresh-token.entity';
 import { VotePerDay, VotePerDaySchema } from './vote-per-day.entity';
 
@@ -26,38 +27,21 @@ export type UserDocument = HydratedDocument<User>;
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   },
-  toJSON: {
-    getters: true,
-    virtuals: true,
-  },
 })
 export class User extends BaseEntity {
-  @Prop({
-    minlength: 1,
-    maxlength: 60,
-    set: (value: string) => value.trim(),
-  })
+  @Prop()
   first_name?: string;
 
-  @Prop({
-    required: true,
-    minlength: 1,
-    maxlength: 60,
-    set: (value: string) => value.trim(),
-  })
+  @Prop({ required: true })
   last_name: string;
 
   @Prop({
     required: true,
     unique: true,
-    match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
   })
   email: string;
 
-  @Prop({
-    minlength: 1,
-    maxlength: 15,
-  })
+  @Prop()
   phone_number?: string;
 
   @Exclude()
@@ -68,28 +52,23 @@ export class User extends BaseEntity {
   @Prop()
   avatar?: string;
 
-  @ApiProperty({
-    type: String,
-  })
-  @Expose({ name: 'avatar_url' })
-  get avatar_url(): string {
-    return this.avatar
-      ? `${process.env.AWS_ENDPOINT}/${process.env.AWS_S3_BUCKET}/${this.avatar}`
-      : 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png';
-  }
-
   @Prop()
   date_of_birth?: Date;
 
-  @Prop({
-    enum: GENDER,
-  })
+  @Prop({ enum: GENDER })
   gender?: GENDER;
 
-  @Prop({
-    default: true,
-  })
+  @Prop()
+  address?: string;
+
+  @Prop({ default: true })
   is_active: boolean;
+
+  @Prop({
+    enum: ROLES,
+    default: ROLES.User,
+  })
+  role: ROLES;
 
   @Exclude()
   @ApiHideProperty()
@@ -100,20 +79,20 @@ export class User extends BaseEntity {
       },
     ],
   })
-  @Type(() => RefreshToken)
   refresh_token: RefreshToken[];
 
-  @Prop({
-    enum: ROLES,
-    default: ROLES.User,
-  })
-  role: ROLES;
-
-  @Prop()
-  address?: string;
-
-  @Prop({ type: VotePerDaySchema, default: () => ({}) })
+  @Prop({ type: VotePerDaySchema, default: () => ({}), required: false })
   vote_per_day?: VotePerDay;
+
+  @Prop({ type: LocationSchema, required: false })
+  location?: Location;
+
+  @Prop({
+    required: false,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Area',
+  })
+  area?: Area;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -45,12 +45,9 @@ export class AuthService {
         password: hash,
       });
 
-      const refreshToken = await this.storeRefreshToken(
-        user._id.toString(),
-        dto.device_name,
-      );
+      const refreshToken = await this.storeRefreshToken(user.id, dto.device_name);
       const accessToken = this.generateAccessToken({
-        user_id: user._id.toString(),
+        user_id: user.id,
         token_id: refreshToken.tokenId,
       });
 
@@ -108,8 +105,7 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException(ERRORS_DICTIONARY.UNAUTHORIZED_EXCEPTION);
       }
-      const refreshToken = user.refresh_token.find((x) => x._id.toString() === tokenId)
-        ?.token;
+      const refreshToken = user.refresh_token.find((x) => x.id === tokenId)?.token;
 
       if (!refreshToken) {
         throw new UnauthorizedException(ERRORS_DICTIONARY.UNAUTHORIZED_EXCEPTION);
@@ -158,7 +154,7 @@ export class AuthService {
       });
       const hashedToken = await argon2.hash(token);
       await this.usersService.setCurrentRefreshToken(userId, {
-        _id: tokenId,
+        id: tokenId,
         token: hashedToken,
         device_name,
       });
