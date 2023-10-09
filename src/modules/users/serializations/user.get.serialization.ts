@@ -47,4 +47,9 @@ export class UserGetSerialization extends ResponseIdSerialization {
   @Exclude()
   @ApiHideProperty()
   refresh_token: RefreshToken[];
+
+  @ApiPropertyOptional()
+  @Expose()
+  @Transform((value) => value.obj?.area?.toString(), { toClassOnly: true })
+  area?: string;
 }

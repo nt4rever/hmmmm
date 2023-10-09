@@ -1,20 +1,8 @@
-import { CreateUserDto } from '@modules/users/dto';
+import { CreateManagerDto } from '@modules/managers/dto';
 import { OmitType } from '@nestjs/swagger';
-import {
-  IsLatitude,
-  IsLongitude,
-  IsMongoId,
-  IsNotEmpty,
-  IsNumber,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsLatitude, IsLongitude, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 
-export class CreateVolunteerDto extends OmitType(CreateUserDto, ['role']) {
-  @IsNotEmpty()
-  @IsMongoId()
-  area_id: string;
-
+export class CreateVolunteerDto extends OmitType(CreateManagerDto, ['area_id']) {
   @IsNotEmpty()
   @IsLatitude()
   lat: number;

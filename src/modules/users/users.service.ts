@@ -1,12 +1,12 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
-import { BaseServiceAbstract } from '@services/base';
-import { ROLES, RefreshToken, User } from './entities';
-import { UsersRepositoryInterface } from './interfaces';
 import { AwsService } from '@modules/aws/aws.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { BaseServiceAbstract } from '@services/base';
+import * as argon2 from 'argon2';
 import { randomUUID } from 'crypto';
 import { CreateUserDto } from './dto';
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import * as argon2 from 'argon2';
+import { RefreshToken, User } from './entities';
+import { UsersRepositoryInterface } from './interfaces';
+import { Area } from '@modules/areas/entities';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
@@ -54,11 +54,8 @@ export class UsersService extends BaseServiceAbstract<User> {
     }
   }
 
-  async createUser(user: User, dto: CreateUserDto) {
+  async registerUser(dto: CreateUserDto & { area?: Area }) {
     try {
-      if (dto.role && dto.role === ROLES.Admin && user.role === ROLES.AreaManager) {
-        throw new ForbiddenException(ERRORS_DICTIONARY.FORBIDDEN);
-      }
       const hashedPassword = await argon2.hash(dto.password);
       return await this.usersRepository.create({ ...dto, password: hashedPassword });
     } catch (error) {
