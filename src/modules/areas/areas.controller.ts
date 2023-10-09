@@ -1,13 +1,15 @@
-import { ApiFindAllResponse } from '@decorators/api-find-all.decorator';
+import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
+import { ApiFindAllQuery } from '@decorators/api-find-all.decorator';
 import { Public } from '@decorators/auth.decorator';
+import { FindAllSerialization } from '@decorators/find-all-serialization.decorator';
 import { Roles } from '@decorators/roles.decorator';
+import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import { ORDER_DIRECTION_TYPE } from '@modules/shared/interfaces';
 import { ROLES } from '@modules/users/entities';
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -18,7 +20,6 @@ import {
   Patch,
   Post,
   Query,
-  SerializeOptions,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -36,8 +37,6 @@ import { ParseOrderPipe } from '@pipes/parse-order.pipe';
 import { AreasService } from './areas.service';
 import { CreateAreaDto, UpdateAreaDto } from './dto';
 import { AreaGetSerialization } from './serializations/area.get.serialization';
-import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
 
 @Controller('areas')
 @ApiTags('areas')
@@ -53,16 +52,11 @@ export class AreasController {
     summary: 'Public API',
   })
   @Public()
-  @UseInterceptors(ClassSerializerInterceptor)
-  @SerializeOptions({
-    excludePrefixes: ['_'],
-    type: AreaGetSerialization,
-  })
-  @ApiOkResponse({
-    type: AreaGetSerialization,
+  @FindAllSerialization({
+    classToIntercept: AreaGetSerialization,
     isArray: true,
   })
-  @ApiFindAllResponse()
+  @ApiFindAllQuery()
   async all(
     @Query('select', ParseFieldsPipe) fields: Record<string, any>,
     @Query('order', ParseOrderPipe) order: Record<string, any>,

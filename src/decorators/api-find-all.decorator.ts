@@ -1,7 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiQuery } from '@nestjs/swagger';
 
-export function ApiFindAllResponse(select = 'name|address', order = 'name|asc') {
+export function ApiFindAllQuery(select = 'name|address', order = 'name|asc') {
   return applyDecorators(
     ApiQuery({
       name: 'select',
