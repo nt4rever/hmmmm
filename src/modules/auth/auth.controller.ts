@@ -1,7 +1,5 @@
 import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
 import { RequestWithUser } from '@custom-types/requests.type';
-import { faker } from '@faker-js/faker';
-import { GENDER } from '@modules/users/entities';
 import {
   Body,
   Controller,
@@ -27,9 +25,9 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto';
+import { JwtAccessTokenGuard } from './guards/jwt-access-token.guard';
 import { JwtRefreshTokenGuard } from './guards/jwt-refresh-token.guard';
 import { LocalAuthGuard } from './guards/local.guard';
-import { JwtAccessTokenGuard } from './guards/jwt-access-token.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -40,23 +38,17 @@ export class AuthController {
   @ApiBody({
     type: SignUpDto,
     examples: {
-      random_user: {
+      admin: {
         value: {
-          first_name: faker.person.firstName(),
-          last_name: faker.person.lastName(),
-          email: faker.internet.email(),
-          phone_number: '+84xxxxxxxxx',
-          date_of_birth: faker.date.birthdate(),
-          password: 'password',
-          gender: GENDER.Male,
-          device_name: 'Iphone XS',
+          last_name: 'Admin',
+          email: 'admin@hmmmm.tech',
+          password: 'abcd1234@@',
         } as SignUpDto,
       },
-      default_user: {
+      manager: {
         value: {
-          first_name: 'John',
-          last_name: 'Alice',
-          email: 'alice@gmail.com',
+          last_name: 'Manager 007',
+          email: 'manager.007@hmmmm.tech',
           password: 'abcd1234@@',
         } as SignUpDto,
       },
@@ -128,16 +120,16 @@ export class AuthController {
   @ApiBody({
     type: SignUpDto,
     examples: {
-      default_user: {
+      admin: {
         value: {
-          email: 'alice@gmail.com',
+          email: 'admin@hmmmm.tech',
           password: 'abcd1234@@',
         } as SignUpDto,
       },
-      error_user: {
+      manager: {
         value: {
-          email: 'michaelsmith@example.com',
-          password: '1232@asdS',
+          email: 'manager.007@hmmmm.tech',
+          password: 'abcd1234@@',
         } as SignUpDto,
       },
     },

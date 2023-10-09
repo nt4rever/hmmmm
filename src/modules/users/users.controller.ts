@@ -7,27 +7,35 @@ import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   Param,
   Patch,
   Post,
   Req,
+  SerializeOptions,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ParseFilePipe } from '@pipes/parse-file.pipe';
 import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { GENDER, ROLES, User } from './entities';
+import { GENDER, ROLES } from './entities';
+import { UserGetSerialization } from './serializations';
 import { UsersService } from './users.service';
 
 @Controller('users')
 @ApiTags('users')
 @ApiBearerAuth('token')
-@UseInterceptors(MongooseClassSerializerInterceptor(User))
 @UseGuards(JwtAccessTokenGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -67,6 +75,8 @@ export class UsersController {
   @ApiOperation({
     summary: 'Get profile current user',
   })
+  @UseInterceptors(MongooseClassSerializerInterceptor(UserGetSerialization))
+  @ApiOkResponse({ type: UserGetSerialization })
   me(@Req() { user }: RequestWithUser) {
     return user;
   }
@@ -78,9 +88,15 @@ export class UsersController {
 
   @Roles(ROLES.Admin)
   @UseGuards(RolesGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @SerializeOptions({
+    type: UserGetSerialization,
+    excludePrefixes: ['_'],
+  })
   @Get()
-  all() {
-    return this.usersService.findAll();
+  async all() {
+    const users = await this.usersService.findAll();
+    return users;
   }
 
   @Post('avatar')
