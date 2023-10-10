@@ -1,7 +1,9 @@
 import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import { ApiFindAllQuery } from '@decorators/api-find-all.decorator';
+import {
+  ApiFindAllQuery,
+  FindAllSerialization,
+} from '@decorators/api-find-all.decorator';
 import { Public } from '@decorators/auth.decorator';
-import { FindAllSerialization } from '@decorators/find-all-serialization.decorator';
 import { Roles } from '@decorators/roles.decorator';
 import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';

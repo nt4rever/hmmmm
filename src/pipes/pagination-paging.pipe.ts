@@ -15,7 +15,7 @@ export function PaginationPagingPipe(
       let page = isNaN(+value?.page) ? PAGINATION_PAGE : +value?.page;
       page = page > PAGINATION_MAX_PAGE ? PAGINATION_MAX_PAGE : page;
 
-      let perPage = isNaN(+value?.perPage) ? PAGINATION_PER_PAGE : +value?.perPage;
+      let perPage = isNaN(+value?.per_page) ? PAGINATION_PER_PAGE : +value?.per_page;
       perPage = perPage > defaultPerPage ? defaultPerPage : perPage;
 
       const offset = (page - 1) * perPage;
@@ -23,7 +23,7 @@ export function PaginationPagingPipe(
       return {
         ...value,
         page,
-        perPage,
+        per_page: perPage,
         limit: perPage,
         offset,
       };

@@ -1,15 +1,14 @@
-import { PaginationListDto } from '@common/dto';
+import { PaginationDto } from '@common/dto';
 import { PaginateResponse } from '@custom-types/common.type';
 import { RequestWithUser } from '@custom-types/requests.type';
 import { ApiImageFile } from '@decorators/api-file.decorator';
-import { Public } from '@decorators/auth.decorator';
+import { PagingSerialization } from '@decorators/api-paging.decorator';
 import { Roles } from '@decorators/roles.decorator';
 import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Get,
   HttpCode,
@@ -19,7 +18,6 @@ import {
   Post,
   Query,
   Req,
-  SerializeOptions,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -39,13 +37,17 @@ import { ROLES, User } from './entities';
 import { UserGetSerialization } from './serializations';
 import { UserPagingSerialization } from './serializations/user.paging.serialization';
 import { UsersService } from './users.service';
+import { PaginationService } from '@modules/pagination/pagination.service';
 
 @Controller('users')
 @ApiTags('users')
 @ApiBearerAuth('token')
 @UseGuards(JwtAccessTokenGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly paginationService: PaginationService,
+  ) {}
 
   @Get('/me')
   @ApiOperation({
@@ -67,16 +69,11 @@ export class UsersController {
   }
 
   @Get()
-  @Public()
   @Roles(ROLES.Admin)
   @UseGuards(RolesGuard)
-  @UseInterceptors(ClassSerializerInterceptor)
-  @SerializeOptions({
-    type: UserPagingSerialization,
-    excludePrefixes: ['_'],
-  })
+  @PagingSerialization(UserPagingSerialization)
   async all(
-    @Query(PaginationPagingPipe()) { page, perPage, limit, offset }: PaginationListDto,
+    @Query(PaginationPagingPipe()) { page, per_page, limit, offset }: PaginationDto,
   ): Promise<PaginateResponse<User>> {
     const count = await this.usersService.count();
     const users = await this.usersService.findAll(
@@ -89,18 +86,14 @@ export class UsersController {
       },
     );
 
-    const pageCount = Math.ceil(count / perPage);
-    return {
-      meta: {
+    return this.paginationService.paginate<User>(
+      {
         page,
-        perPage,
-        itemCount: users.length,
-        pageCount,
-        hasNext: page < pageCount,
-        hasPrev: page > 1,
+        per_page,
+        count,
       },
-      items: users,
-    };
+      users,
+    );
   }
 
   @Post('avatar')

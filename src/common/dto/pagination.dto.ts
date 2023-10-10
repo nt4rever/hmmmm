@@ -1,15 +1,20 @@
 import { ApiHideProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Allow } from 'class-validator';
 
-export class PaginationListDto {
+export class PaginationDto {
   @ApiPropertyOptional()
+  @Allow()
   page: number;
 
   @ApiPropertyOptional()
-  perPage: number;
+  @Allow()
+  per_page: number;
 
   @ApiHideProperty()
+  @Allow()
   limit: number;
 
   @ApiHideProperty()
+  @Allow()
   offset: number;
 }
