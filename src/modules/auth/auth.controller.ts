@@ -45,10 +45,10 @@ export class AuthController {
           password: 'abcd1234@@',
         } as SignUpDto,
       },
-      manager: {
+      user: {
         value: {
-          last_name: 'Manager 007',
-          email: 'manager.007@hmmmm.tech',
+          last_name: 'user 007',
+          email: 'user.007@hmmmm.tech',
           password: 'abcd1234@@',
         } as SignUpDto,
       },

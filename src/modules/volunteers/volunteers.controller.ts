@@ -69,6 +69,11 @@ export class VolunteersController {
       ...dto,
       role: ROLES.Volunteer,
       area: manager.area,
+      location: {
+        lat: dto.lat,
+        lng: dto.lng,
+        radius: dto.radius,
+      },
     });
   }
 }
