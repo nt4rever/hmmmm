@@ -13,7 +13,7 @@ export type PaginateParams = { offset: number; limit: number };
 
 export type PageMeta = {
   readonly page: number;
-  readonly take: number;
+  readonly perPage: number;
   readonly itemCount: number;
   readonly pageCount: number;
   readonly hasNext: boolean;

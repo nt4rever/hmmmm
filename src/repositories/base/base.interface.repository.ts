@@ -1,6 +1,7 @@
 import {
   IDatabaseFindAllOptions,
   IDatabaseFindOneOptions,
+  IDatabaseGetTotalOptions,
 } from '@modules/shared/interfaces/database.interface';
 import { ClientSession } from 'mongoose';
 
@@ -18,6 +19,8 @@ export interface BaseRepositoryInterface<T> {
     find?: Record<string, any>,
     options?: IDatabaseFindAllOptions<ClientSession>,
   ): Promise<T[]>;
+
+  count(find?: Record<string, any>, options?: IDatabaseGetTotalOptions): Promise<number>;
 
   update(_id: string, dto: Partial<T>): Promise<T>;
 
