@@ -2,6 +2,7 @@ import { BaseEntity } from '@modules/shared/base';
 import {
   IDatabaseFindAllOptions,
   IDatabaseFindOneOptions,
+  IDatabaseGetTotalOptions,
 } from '@modules/shared/interfaces/database.interface';
 import { BaseRepositoryInterface } from '@repositories/base';
 import { ClientSession } from 'mongoose';
@@ -32,6 +33,13 @@ export abstract class BaseServiceAbstract<T extends BaseEntity>
     options?: IDatabaseFindOneOptions<ClientSession>,
   ) {
     return await this.repository.findOneByCondition(find, options);
+  }
+
+  async count(
+    find?: Record<string, any>,
+    options?: IDatabaseGetTotalOptions<ClientSession>,
+  ): Promise<number> {
+    return await this.repository.count(find, options);
   }
 
   async update(_id: string, updateDto: Partial<T>) {

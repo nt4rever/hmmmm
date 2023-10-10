@@ -7,26 +7,15 @@ import {
 } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 
-interface IFindAllSerialization {
-  classToIntercept: Type;
-  isArray?: boolean;
-  excludePrefixes?: string[];
-}
-
-export function FindAllSerialization({
-  classToIntercept,
-  isArray = false,
-  excludePrefixes = ['_'],
-}: IFindAllSerialization) {
+export function PagingSerialization(classToIntercept: Type) {
   return applyDecorators(
     UseInterceptors(ClassSerializerInterceptor),
     SerializeOptions({
-      excludePrefixes,
       type: classToIntercept,
+      excludePrefixes: ['_'],
     }),
     ApiOkResponse({
       type: classToIntercept,
-      isArray,
     }),
   );
 }

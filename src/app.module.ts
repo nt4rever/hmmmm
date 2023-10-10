@@ -1,18 +1,19 @@
 import { DatabaseConfig, database_config } from '@configs/configuration.config';
 import { ClassValidatorExceptionFilter } from '@exception-filters/class-validator-exception.filter';
+import { GlobalExceptionFilter } from '@exception-filters/global-exception.filter';
 import { MongoExceptionFilter } from '@exception-filters/mongo-exception.filter';
+import { AreasModule } from '@modules/areas/areas.module';
 import { AuthModule } from '@modules/auth/auth.module';
+import { AwsModule } from '@modules/aws/aws.module';
+import { ManagersModule } from '@modules/managers/managers.module';
+import { PaginationModule } from '@modules/pagination/pagination.module';
 import { UsersModule } from '@modules/users/users.module';
+import { VolunteersModule } from '@modules/volunteers/volunteers.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
-import { GlobalExceptionFilter } from '@exception-filters/global-exception.filter';
-import { AwsModule } from '@modules/aws/aws.module';
 import * as Joi from 'joi';
-import { AreasModule } from '@modules/areas/areas.module';
-import { VolunteersModule } from '@modules/volunteers/volunteers.module';
-import { ManagersModule } from '@modules/managers/managers.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { ManagersModule } from '@modules/managers/managers.module';
     AreasModule,
     VolunteersModule,
     ManagersModule,
+    PaginationModule,
   ],
   controllers: [],
   providers: [

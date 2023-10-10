@@ -1,6 +1,7 @@
 import {
   IDatabaseFindAllOptions,
   IDatabaseFindOneOptions,
+  IDatabaseGetTotalOptions,
 } from '@modules/shared/interfaces/database.interface';
 import { ClientSession } from 'mongoose';
 
@@ -20,6 +21,10 @@ export interface Read<T> {
     find: Record<string, any>,
     options?: IDatabaseFindOneOptions<ClientSession>,
   ): Promise<T>;
+  count(
+    find?: Record<string, any>,
+    options?: IDatabaseGetTotalOptions<ClientSession>,
+  ): Promise<number>;
 }
 
 export interface BaseServiceInterface<T> extends Write<T>, Read<T> {}

@@ -2,6 +2,7 @@ import { BaseEntity } from '@modules/shared/base';
 import {
   IDatabaseFindAllOptions,
   IDatabaseFindOneOptions,
+  IDatabaseGetTotalOptions,
 } from '@modules/shared/interfaces/database.interface';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
 import { BaseRepositoryInterface } from './base.interface.repository';
@@ -140,6 +141,36 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     }
 
     return findAll.lean() as any;
+  }
+
+  async count(
+    find?: Record<string, any>,
+    options?: IDatabaseGetTotalOptions,
+  ): Promise<number> {
+    const count = this.model.countDocuments(find);
+
+    if (options?.withDeleted) {
+      count.or([
+        {
+          deleted_at: { $exists: false },
+        },
+        {
+          deleted_at: { $exists: true },
+        },
+      ]);
+    } else {
+      count.where('deleted_at').exists(false);
+    }
+
+    if (options?.session) {
+      count.session(options.session);
+    }
+
+    if (options?.join) {
+      count.populate(options.join as PopulateOptions | PopulateOptions[]);
+    }
+
+    return count.exec();
   }
 
   async update(_id: string, dto: Partial<T>): Promise<T> {

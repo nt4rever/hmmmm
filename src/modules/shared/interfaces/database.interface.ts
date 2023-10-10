@@ -12,6 +12,11 @@ export interface IDatabaseFindOneOptions<T = any>
   withDeleted?: boolean;
 }
 
+export type IDatabaseGetTotalOptions<T = any> = Pick<
+  IDatabaseFindOneOptions<T>,
+  'session' | 'withDeleted' | 'join'
+>;
+
 export enum ORDER_DIRECTION_TYPE {
   ASC = 'asc',
   DESC = 'desc',
