@@ -7,6 +7,7 @@ import { CreateUserDto } from './dto';
 import { RefreshToken, User } from './entities';
 import { UsersRepositoryInterface } from './interfaces';
 import { Area } from '@modules/areas/entities';
+import { Location } from '@modules/shared/base';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
@@ -54,7 +55,7 @@ export class UsersService extends BaseServiceAbstract<User> {
     }
   }
 
-  async registerUser(dto: CreateUserDto & { area?: Area }) {
+  async registerUser(dto: CreateUserDto & { area?: Area; location?: Location }) {
     try {
       const hashedPassword = await argon2.hash(dto.password);
       return await this.usersRepository.create({ ...dto, password: hashedPassword });

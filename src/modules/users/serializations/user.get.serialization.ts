@@ -1,8 +1,9 @@
 import { ResponseIdSerialization } from '@common/serializations';
 import { ApiHideProperty, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { GENDER, ROLES, RefreshToken, VotePerDay } from '../entities';
 import { getAvatarUrl } from '@utils/getAvatarUrl';
+import { Location } from '@modules/shared/base';
 
 export class UserGetSerialization extends ResponseIdSerialization {
   @ApiPropertyOptional()
@@ -38,6 +39,7 @@ export class UserGetSerialization extends ResponseIdSerialization {
   role: ROLES;
 
   @ApiPropertyOptional()
+  @Type(() => VotePerDay)
   vote_per_day?: VotePerDay;
 
   @Exclude()
@@ -52,4 +54,8 @@ export class UserGetSerialization extends ResponseIdSerialization {
   @Expose()
   @Transform((value) => value.obj?.area?.toString(), { toClassOnly: true })
   area?: string;
+
+  @ApiPropertyOptional()
+  @Type(() => Location)
+  location?: Location;
 }
