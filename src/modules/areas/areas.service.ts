@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AreasRepositoryInterface } from './interfaces';
-import { BaseServiceAbstract } from '@services/base';
 import { Area } from './entities';
+import { BaseServiceAbstract } from '@/services/base';
 
 @Injectable()
 export class AreasService extends BaseServiceAbstract<Area> {

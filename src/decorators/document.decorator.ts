@@ -1,4 +1,4 @@
-import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
+import MongooseClassSerializerInterceptor from '@/interceptors/mongoose-class-serializer.interceptor';
 import { Type, UseInterceptors, applyDecorators } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 

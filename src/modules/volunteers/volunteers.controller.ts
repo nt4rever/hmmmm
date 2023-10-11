@@ -1,8 +1,3 @@
-import { RequestWithUser } from '@common/types/requests.type';
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import { Roles } from '@decorators/roles.decorator';
-import { ROLES } from '@modules/users/entities';
-import { UsersService } from '@modules/users/users.service';
 import {
   Body,
   Controller,
@@ -17,7 +12,12 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateVolunteerDoc } from './docs';
 import { CreateVolunteerDto } from './dto';
 import { VolunteersService } from './volunteers.service';
-import { JwtAccessTokenGuard, RolesGuard } from '@modules/auth/guards';
+import { RequestWithUser } from '@/common/types';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import { Roles } from '@/decorators/roles.decorator';
+import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
+import { ROLES } from '../users/entities';
+import { UsersService } from '../users/users.service';
 
 @ApiTags('volunteers')
 @ApiBearerAuth('token')

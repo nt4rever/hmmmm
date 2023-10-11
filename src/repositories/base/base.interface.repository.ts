@@ -1,8 +1,8 @@
 import {
-  IDatabaseFindAllOptions,
   IDatabaseFindOneOptions,
+  IDatabaseFindAllOptions,
   IDatabaseGetTotalOptions,
-} from '@common/interfaces/database.interface';
+} from '@/common/interfaces';
 import { ClientSession } from 'mongoose';
 
 export interface BaseRepositoryInterface<T> {

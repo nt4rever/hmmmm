@@ -1,4 +1,4 @@
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';

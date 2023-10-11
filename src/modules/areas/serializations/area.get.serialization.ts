@@ -1,4 +1,4 @@
-import { ResponseIdSerialization } from '@common/serializations';
+import { ResponseIdSerialization } from '@/common/serializations';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AreaGetSerialization extends ResponseIdSerialization {

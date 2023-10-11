@@ -1,9 +1,9 @@
-import { ResponseIdSerialization } from '@common/serializations';
 import { ApiHideProperty, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { GENDER, ROLES, RefreshToken, VotePerDay } from '../entities';
-import { getAvatarUrl } from '@utils/getAvatarUrl';
-import { Location } from '@modules/shared/base';
+import { ResponseIdSerialization } from '@/common/serializations';
+import { getAvatarUrl } from '@/utils/getAvatarUrl';
+import { Location } from '@/modules/shared/base';
 
 export class UserGetSerialization extends ResponseIdSerialization {
   @ApiPropertyOptional()

@@ -1,4 +1,4 @@
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import {
   ArgumentsHost,
   Catch,

@@ -1,11 +1,11 @@
-import { BaseEntity } from '@modules/shared/base';
-import {
-  IDatabaseFindAllOptions,
-  IDatabaseFindOneOptions,
-  IDatabaseGetTotalOptions,
-} from '@common/interfaces/database.interface';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
 import { BaseRepositoryInterface } from './base.interface.repository';
+import {
+  IDatabaseFindOneOptions,
+  IDatabaseFindAllOptions,
+  IDatabaseGetTotalOptions,
+} from '@/common/interfaces';
+import { BaseEntity } from '@/modules/shared/base';
 
 export abstract class BaseRepositoryAbstract<T extends BaseEntity>
   implements BaseRepositoryInterface<T>

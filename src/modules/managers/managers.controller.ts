@@ -1,9 +1,6 @@
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import { Roles } from '@decorators/roles.decorator';
-import { AreasService } from '@modules/areas/areas.service';
-import { JwtAccessTokenGuard, RolesGuard } from '@modules/auth/guards';
-import { ROLES } from '@modules/users/entities';
-import { UsersService } from '@modules/users/users.service';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+
+import { Roles } from '@/decorators/roles.decorator';
 import {
   Body,
   Controller,
@@ -14,6 +11,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AreasService } from '../areas/areas.service';
+import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
+import { ROLES } from '../users/entities';
+import { UsersService } from '../users/users.service';
 import { CreateManagerDoc } from './docs';
 import { CreateManagerDto } from './dto';
 import { ManagersService } from './managers.service';

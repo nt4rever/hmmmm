@@ -1,4 +1,4 @@
-import { GENDER } from '@modules/users/entities';
+import { GENDER } from '@/modules/users/entities';
 import {
   IsDateString,
   IsEmail,

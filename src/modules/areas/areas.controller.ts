@@ -1,15 +1,3 @@
-import { ORDER_DIRECTION_TYPE } from '@common/interfaces';
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import {
-  ApiFindAllQuery,
-  FindAllSerialization,
-} from '@decorators/api-find-all.decorator';
-import { Public } from '@decorators/auth.decorator';
-import { DocumentSerialization } from '@decorators/document.decorator';
-import { Roles } from '@decorators/roles.decorator';
-import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
-import { RolesGuard } from '@modules/auth/guards/roles.guard';
-import { ROLES } from '@modules/users/entities';
 import {
   Body,
   Controller,
@@ -30,13 +18,25 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ParseFieldsPipe } from '@pipes/parse-fields.pipe';
-import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
-import { ParseOrderPipe } from '@pipes/parse-order.pipe';
+
 import { AreasService } from './areas.service';
 import { CreateAreaDoc } from './docs';
 import { CreateAreaDto, UpdateAreaDto } from './dto';
 import { AreaGetSerialization } from './serializations';
+import { ORDER_DIRECTION_TYPE } from '@/common/interfaces';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import {
+  FindAllSerialization,
+  ApiFindAllQuery,
+} from '@/decorators/api-find-all.decorator';
+import { Public } from '@/decorators/auth.decorator';
+import { DocumentSerialization } from '@/decorators/document.decorator';
+import { Roles } from '@/decorators/roles.decorator';
+import { ParseFieldsPipe } from '@/pipes/parse-fields.pipe';
+import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
+import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
+import { RolesGuard, JwtAccessTokenGuard } from '../auth/guards';
+import { ROLES } from '../users/entities';
 
 @Controller('areas')
 @ApiTags('areas')

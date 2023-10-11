@@ -1,7 +1,7 @@
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
 import { applyDecorators } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { SignUpDto } from '../dto';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 
 export function SignInDoc() {
   return applyDecorators(

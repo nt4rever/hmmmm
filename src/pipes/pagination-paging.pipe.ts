@@ -1,9 +1,9 @@
 import {
-  PAGINATION_MAX_PAGE,
   PAGINATION_MAX_PER_PAGE,
   PAGINATION_PAGE,
+  PAGINATION_MAX_PAGE,
   PAGINATION_PER_PAGE,
-} from '@constraints/pagination.constraint';
+} from '@/constraints/pagination.constraint';
 import { Injectable, PipeTransform, Scope, Type, mixin } from '@nestjs/common';
 
 export function PaginationPagingPipe(

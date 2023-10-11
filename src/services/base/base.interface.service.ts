@@ -2,7 +2,7 @@ import {
   IDatabaseFindAllOptions,
   IDatabaseFindOneOptions,
   IDatabaseGetTotalOptions,
-} from '@common/interfaces/database.interface';
+} from '@/common/interfaces';
 import { ClientSession } from 'mongoose';
 
 export interface Write<T> {

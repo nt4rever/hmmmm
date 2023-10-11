@@ -1,4 +1,4 @@
-import { CreateManagerDto } from '@modules/managers/dto';
+import { CreateManagerDto } from '@/modules/managers/dto';
 import { OmitType } from '@nestjs/swagger';
 import { IsLatitude, IsLongitude, IsNotEmpty, IsNumber, Max, Min } from 'class-validator';
 

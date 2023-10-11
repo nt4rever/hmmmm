@@ -1,11 +1,3 @@
-import { PaginationDto } from '@common/dto';
-import { ApiImageFile } from '@decorators/api-file.decorator';
-import { PagingSerialization } from '@decorators/api-paging.decorator';
-import { Roles } from '@decorators/roles.decorator';
-import { PaginateResponse, RequestWithUser } from '@common/types';
-import { DocumentSerialization } from '@decorators/document.decorator';
-import { JwtAccessTokenGuard, RolesGuard } from '@modules/auth/guards';
-import { PaginationService } from '@modules/pagination/pagination.service';
 import {
   Body,
   Controller,
@@ -13,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Query,
@@ -26,13 +19,20 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { PaginationPagingPipe } from '@pipes/pagination-paging.pipe';
-import { ParseFilePipe } from '@pipes/parse-file.pipe';
-import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
 import { UpdateUserDto } from './dto';
 import { ROLES, User } from './entities';
 import { UserGetSerialization, UserPagingSerialization } from './serializations';
 import { UsersService } from './users.service';
+import { PaginationDto } from '@/common/dto';
+import { RequestWithUser, PaginateResponse } from '@/common/types';
+import { ApiImageFile } from '@/decorators/api-file.decorator';
+import { PagingSerialization } from '@/decorators/api-paging.decorator';
+import { DocumentSerialization } from '@/decorators/document.decorator';
+import { Roles } from '@/decorators/roles.decorator';
+import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
+import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
+import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
+import { PaginationService } from '../pagination/pagination.service';
 
 @Controller('users')
 @ApiTags('users')

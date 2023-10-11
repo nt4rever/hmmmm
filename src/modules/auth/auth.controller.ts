@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
 import { LogoutDoc, RefreshAccessTokenDoc, SignInDoc, SignUpDoc } from './docs';
 import { SignUpDto } from './dto';
 import { JwtAccessTokenGuard, JwtRefreshTokenGuard, LocalAuthGuard } from './guards';
-import { RequestWithUser } from '@common/types';
+import { RequestWithUser } from '@/common/types';
 
 @Controller('auth')
 @ApiTags('auth')

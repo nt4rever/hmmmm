@@ -1,9 +1,9 @@
-import { RefreshToken, User, UserDocument } from '@modules/users/entities';
-import { UsersRepositoryInterface } from '@modules/users/interfaces';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BaseRepositoryAbstract } from './base';
+import { UserDocument, User, RefreshToken } from '@/modules/users/entities';
+import { UsersRepositoryInterface } from '@/modules/users/interfaces';
 
 @Injectable()
 export class UsersRepository

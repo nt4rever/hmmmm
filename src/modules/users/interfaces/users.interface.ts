@@ -1,4 +1,4 @@
-import { BaseRepositoryInterface } from '@repositories/base';
+import { BaseRepositoryInterface } from '@/repositories/base';
 import { RefreshToken, User } from '../entities';
 
 export interface UsersRepositoryInterface extends BaseRepositoryInterface<User> {

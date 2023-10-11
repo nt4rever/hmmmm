@@ -1,4 +1,4 @@
-import { User } from '@modules/users/entities';
+import { User } from '@/modules/users/entities';
 import { Request } from 'express';
 
 export interface RequestWithUser extends Request {
