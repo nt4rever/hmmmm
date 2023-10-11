@@ -1,19 +1,23 @@
-import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
-
+import { FindAllSerialization } from '@/decorators/api-find-all.decorator';
 import { Roles } from '@/decorators/roles.decorator';
+import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
+import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
+  Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AreasService } from '../areas/areas.service';
 import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
 import { ROLES } from '../users/entities';
+import { UserGetSerialization } from '../users/serializations';
 import { UsersService } from '../users/users.service';
 import { CreateManagerDoc } from './docs';
 import { CreateManagerDto } from './dto';
@@ -36,17 +40,46 @@ export class ManagersController {
   @UseGuards(RolesGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async create(@Body() dto: CreateManagerDto) {
-    const area = await this.areasService.findOneByCondition({
-      _id: dto.area_id,
-      is_active: true,
-    });
-
-    if (!area) throw new NotFoundException(ERRORS_DICTIONARY.AREA_NOT_FOUND);
+    const area = await this.areasService.get(dto.area_id);
 
     await this.userService.registerUser({
       ...dto,
       role: ROLES.AreaManager,
       area,
     });
+  }
+
+  @Get('area/:id')
+  @FindAllSerialization({
+    classToIntercept: UserGetSerialization,
+  })
+  @ApiOperation({
+    summary: 'Admin get all area manager belong to area',
+  })
+  @ApiQuery({
+    name: 'order',
+    type: 'string',
+    required: false,
+    example: 'last_name|asc',
+  })
+  @Roles(ROLES.Admin)
+  @UseGuards(RolesGuard)
+  async managerOfArea(
+    @Param('id', ParseMongoIdPipe) areaId: string,
+    @Query('order', ParseOrderPipe) order: Record<string, any>,
+  ) {
+    const area = await this.areasService.get(areaId);
+
+    return await this.userService.findAll(
+      {
+        area,
+        role: ROLES.AreaManager,
+      },
+      {
+        order: {
+          ...order,
+        },
+      },
+    );
   }
 }

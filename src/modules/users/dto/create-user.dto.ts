@@ -8,6 +8,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { GENDER, ROLES } from '../entities';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
   @IsOptional()
@@ -21,6 +22,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MaxLength(50)
   @IsEmail()
+  @ApiProperty({
+    example: 'user.001@hmmmm.tech',
+  })
   email: string;
 
   @IsOptional()
