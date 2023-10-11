@@ -1,7 +1,7 @@
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import { RequestWithUser } from '@custom-types/requests.type';
-import { IS_PUBLIC_KEY } from '@decorators/auth.decorator';
-import { ROLES_KEY } from '@decorators/roles.decorator';
+import { RequestWithUser } from '@/common/types';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import { IS_PUBLIC_KEY } from '@/decorators/auth.decorator';
+import { ROLES_KEY } from '@/decorators/roles.decorator';
 import {
   CanActivate,
   ExecutionContext,

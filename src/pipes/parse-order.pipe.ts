@@ -1,4 +1,4 @@
-import { ORDER_DIRECTION_TYPE } from '@modules/shared/interfaces/database.interface';
+import { ORDER_DIRECTION_TYPE } from '@/common/interfaces';
 import { Injectable, PipeTransform } from '@nestjs/common';
 
 @Injectable()

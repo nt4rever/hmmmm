@@ -1,4 +1,4 @@
-import { BaseEntity } from '@modules/shared/base';
+import { BaseEntity } from '@/modules/shared/base';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 

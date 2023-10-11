@@ -1,4 +1,3 @@
-import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import {
   Body,
   Controller,
@@ -9,20 +8,16 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiNoContentResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
-import { VolunteersService } from './volunteers.service';
-import { UsersService } from '@modules/users/users.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CreateVolunteerDoc } from './docs';
 import { CreateVolunteerDto } from './dto';
-import { RequestWithUser } from '@custom-types/requests.type';
-import { RolesGuard } from '@modules/auth/guards/roles.guard';
-import { Roles } from '@decorators/roles.decorator';
-import { ROLES } from '@modules/users/entities';
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
+import { VolunteersService } from './volunteers.service';
+import { RequestWithUser } from '@/common/types';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import { Roles } from '@/decorators/roles.decorator';
+import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
+import { ROLES } from '../users/entities';
+import { UsersService } from '../users/users.service';
 
 @ApiTags('volunteers')
 @ApiBearerAuth('token')
@@ -35,13 +30,10 @@ export class VolunteersController {
   ) {}
 
   @Post()
-  @ApiOperation({
-    summary: 'Area manager create volunteer',
-  })
-  @ApiNoContentResponse()
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @CreateVolunteerDoc()
   @Roles(ROLES.AreaManager)
   @UseGuards(RolesGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async create(@Body() dto: CreateVolunteerDto, @Req() { user }: RequestWithUser) {
     const manager = await this.userService.findOneByCondition(
       {

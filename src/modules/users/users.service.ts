@@ -1,13 +1,13 @@
-import { AwsService } from '@modules/aws/aws.service';
-import { Inject, Injectable } from '@nestjs/common';
-import { BaseServiceAbstract } from '@services/base';
 import * as argon2 from 'argon2';
 import { randomUUID } from 'crypto';
 import { CreateUserDto } from './dto';
 import { RefreshToken, User } from './entities';
 import { UsersRepositoryInterface } from './interfaces';
-import { Area } from '@modules/areas/entities';
-import { Location } from '@modules/shared/base';
+import { BaseServiceAbstract } from '@/services/base';
+import { Injectable, Inject } from '@nestjs/common';
+import { Area } from '../areas/entities';
+import { AwsService } from '../aws/aws.service';
+import { Location } from '../shared/base';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {

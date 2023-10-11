@@ -1,6 +1,4 @@
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import { User } from '@modules/users/entities';
-import { UsersService } from '@modules/users/users.service';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import {
   ConflictException,
   Injectable,
@@ -11,6 +9,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import mongoose from 'mongoose';
+import { User } from '../users/entities';
+import { UsersService } from '../users/users.service';
 import { SignUpDto } from './dto';
 import { TokenPayload } from './interfaces';
 

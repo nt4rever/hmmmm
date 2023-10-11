@@ -1,5 +1,3 @@
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import { RequestWithUser } from '@custom-types/requests.type';
 import {
   Body,
   Controller,
@@ -12,22 +10,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
-  ApiBearerAuth,
-  ApiBody,
-  ApiConflictResponse,
-  ApiCreatedResponse,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { LogoutDoc, RefreshAccessTokenDoc, SignInDoc, SignUpDoc } from './docs';
 import { SignUpDto } from './dto';
-import { JwtAccessTokenGuard } from './guards/jwt-access-token.guard';
-import { JwtRefreshTokenGuard } from './guards/jwt-refresh-token.guard';
-import { LocalAuthGuard } from './guards/local.guard';
+import { JwtAccessTokenGuard, JwtRefreshTokenGuard, LocalAuthGuard } from './guards';
+import { RequestWithUser } from '@/common/types';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -35,159 +23,23 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('sign-up')
-  @ApiBody({
-    type: SignUpDto,
-    examples: {
-      admin: {
-        value: {
-          last_name: 'Admin',
-          email: 'admin@hmmmm.tech',
-          password: 'abcd1234@@',
-        } as SignUpDto,
-      },
-      user: {
-        value: {
-          last_name: 'user 007',
-          email: 'user.007@hmmmm.tech',
-          password: 'abcd1234@@',
-        } as SignUpDto,
-      },
-    },
-  })
-  @ApiCreatedResponse({
-    description: 'User created successfully!!',
-    content: {
-      'application/json': {
-        examples: {
-          created_user: {
-            summary: 'Response after sign up',
-            value: {
-              accessToken: 'token',
-              refreshToken: 'token',
-            },
-          },
-        },
-      },
-    },
-  })
-  @ApiBadRequestResponse({
-    description: 'Validation failed',
-    content: {
-      'application/json': {
-        examples: {
-          invalid_email_password: {
-            value: {
-              statusCode: 400,
-              message: ERRORS_DICTIONARY.VALIDATION_ERROR,
-              error: ['email must be an email', 'password is not strong enough'],
-            },
-          },
-          some_fields_missing: {
-            value: {
-              statusCode: 400,
-              message: ERRORS_DICTIONARY.VALIDATION_ERROR,
-              error: [
-                'last_name must be shorter than or equal to 50 characters',
-                'last_name should not be empty',
-              ],
-            },
-          },
-        },
-      },
-    },
-  })
-  @ApiConflictResponse({
-    description: 'Conflict user info',
-    content: {
-      'application/json': {
-        examples: {
-          email_duplication: {
-            value: {
-              statusCode: 409,
-              message: ERRORS_DICTIONARY.EMAIL_EXISTED,
-            },
-          },
-        },
-      },
-    },
-  })
+  @SignUpDoc()
   async signUp(@Body() dto: SignUpDto) {
     return await this.authService.signUp(dto);
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('sign-in')
-  @ApiBody({
-    type: SignUpDto,
-    examples: {
-      admin: {
-        value: {
-          email: 'admin@hmmmm.tech',
-          password: 'abcd1234@@',
-        } as SignUpDto,
-      },
-      manager: {
-        value: {
-          email: 'manager.007@hmmmm.tech',
-          password: 'abcd1234@@',
-        } as SignUpDto,
-      },
-    },
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Sign in successfully!!',
-    content: {
-      'application/json': {
-        example: {
-          accessToken: 'token',
-          refreshToken: 'token',
-        },
-      },
-    },
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Wrong credentials!!',
-    content: {
-      'application/json': {
-        example: {
-          statusCode: 401,
-          message: ERRORS_DICTIONARY.WRONG_CREDENTIALS,
-        },
-      },
-    },
-  })
+  @SignInDoc()
+  @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   async signIn(@Req() request: RequestWithUser) {
     return await this.authService.signIn(request.user.id);
   }
 
-  @UseGuards(JwtRefreshTokenGuard)
   @Post('refresh')
+  @RefreshAccessTokenDoc()
+  @UseGuards(JwtRefreshTokenGuard)
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('token')
-  @ApiResponse({
-    status: 200,
-    description: 'Create new access token successfully!!',
-    content: {
-      'application/json': {
-        example: {
-          accessToken: 'token',
-        },
-      },
-    },
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized!!',
-    content: {
-      'application/json': {
-        example: {
-          statusCode: 401,
-          message: 'Unauthorized',
-        },
-      },
-    },
-  })
   async refreshAccessToken(@Req() request: RequestWithUser) {
     const accessToken = this.authService.generateAccessToken({
       user_id: request.user.id,
@@ -198,15 +50,10 @@ export class AuthController {
     };
   }
 
-  @UseGuards(JwtAccessTokenGuard)
   @Get('logout')
+  @LogoutDoc()
+  @UseGuards(JwtAccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiBearerAuth('token')
-  @ApiQuery({
-    name: 'all_device',
-    type: Boolean,
-    required: false,
-  })
   async logOut(
     @Req() request: RequestWithUser,
     @Query('all_device', new ParseBoolPipe({ optional: true })) allDevice?: boolean,

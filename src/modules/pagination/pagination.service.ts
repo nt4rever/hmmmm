@@ -1,5 +1,5 @@
-import { PaginationDto } from '@common/dto';
-import { PaginateResponse } from '@custom-types/common.type';
+import { PaginationDto } from '@/common/dto';
+import { PaginateResponse } from '@/common/types';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

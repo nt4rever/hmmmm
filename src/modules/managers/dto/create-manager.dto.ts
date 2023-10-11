@@ -1,4 +1,4 @@
-import { CreateUserDto } from '@modules/users/dto';
+import { CreateUserDto } from '@/modules/users/dto';
 import { OmitType } from '@nestjs/swagger';
 import { IsNotEmpty, IsMongoId } from 'class-validator';
 

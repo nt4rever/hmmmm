@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AreasRepository } from '@repositories/areas.repository';
 import { AreasController } from './areas.controller';
 import { AreasService } from './areas.service';
 import { Area, AreaSchema } from './entities';
+import { AreasRepository } from '@/repositories/areas.repository';
 
 @Module({
   imports: [

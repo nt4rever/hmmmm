@@ -1,12 +1,12 @@
-import { BaseEntity } from '@modules/shared/base';
+import { ClientSession } from 'mongoose';
+import { BaseServiceInterface } from './base.interface.service';
 import {
   IDatabaseFindAllOptions,
   IDatabaseFindOneOptions,
   IDatabaseGetTotalOptions,
-} from '@modules/shared/interfaces/database.interface';
-import { BaseRepositoryInterface } from '@repositories/base';
-import { ClientSession } from 'mongoose';
-import { BaseServiceInterface } from './base.interface.service';
+} from '@/common/interfaces';
+import { BaseEntity } from '@/modules/shared/base';
+import { BaseRepositoryInterface } from '@/repositories/base';
 
 export abstract class BaseServiceAbstract<T extends BaseEntity>
   implements BaseServiceInterface<T>

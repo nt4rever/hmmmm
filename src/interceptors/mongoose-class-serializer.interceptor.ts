@@ -1,4 +1,3 @@
-import { PageMeta } from '@custom-types/common.type';
 import { ClassSerializerInterceptor, PlainLiteralObject, Type } from '@nestjs/common';
 import { ClassTransformOptions, plainToClass } from 'class-transformer';
 import { Document } from 'mongoose';
@@ -16,21 +15,7 @@ export default function MongooseClassSerializerInterceptor(
       });
     }
 
-    private prepareResponse(
-      response:
-        | PlainLiteralObject
-        | PlainLiteralObject[]
-        | { items: PlainLiteralObject[]; count: number }
-        | { items: PlainLiteralObject[]; meta: PageMeta },
-    ) {
-      if (!Array.isArray(response) && response?.items) {
-        const items = this.prepareResponse(response.items);
-        return {
-          ...response,
-          items,
-        };
-      }
-
+    private prepareResponse(response: PlainLiteralObject | PlainLiteralObject[]) {
       if (Array.isArray(response)) {
         return response.map(this.changePlainObjectToClass);
       }

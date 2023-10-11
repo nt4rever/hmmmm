@@ -1,11 +1,11 @@
-import { Area } from '@modules/areas/entities';
-import { BaseEntity, Location, LocationSchema } from '@modules/shared/base';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { RefreshToken, RefreshTokenSchema } from './refresh-token.entity';
 import { VotePerDay, VotePerDaySchema } from './vote-per-day.entity';
+import { Area } from '@/modules/areas/entities';
+import { BaseEntity, Location, LocationSchema } from '@/modules/shared/base';
 
 export enum GENDER {
   Male = 'MALE',

@@ -1,12 +1,3 @@
-import { PaginationDto } from '@common/dto';
-import { PaginateResponse } from '@custom-types/common.type';
-import { RequestWithUser } from '@custom-types/requests.type';
-import { ApiImageFile } from '@decorators/api-file.decorator';
-import { PagingSerialization } from '@decorators/api-paging.decorator';
-import { Roles } from '@decorators/roles.decorator';
-import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
-import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
-import { RolesGuard } from '@modules/auth/guards/roles.guard';
 import {
   Body,
   Controller,
@@ -14,30 +5,34 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Query,
   Req,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiNoContentResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { PaginationPagingPipe } from '@pipes/pagination-paging.pipe';
-import { ParseFilePipe } from '@pipes/parse-file.pipe';
-import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
 import { UpdateUserDto } from './dto';
 import { ROLES, User } from './entities';
-import { UserGetSerialization } from './serializations';
-import { UserPagingSerialization } from './serializations/user.paging.serialization';
+import { UserGetSerialization, UserPagingSerialization } from './serializations';
 import { UsersService } from './users.service';
-import { PaginationService } from '@modules/pagination/pagination.service';
+import { PaginationDto } from '@/common/dto';
+import { RequestWithUser, PaginateResponse } from '@/common/types';
+import { ApiImageFile } from '@/decorators/api-file.decorator';
+import { PagingSerialization } from '@/decorators/api-paging.decorator';
+import { DocumentSerialization } from '@/decorators/document.decorator';
+import { Roles } from '@/decorators/roles.decorator';
+import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
+import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
+import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
+import { PaginationService } from '../pagination/pagination.service';
 
 @Controller('users')
 @ApiTags('users')
@@ -53,8 +48,7 @@ export class UsersController {
   @ApiOperation({
     summary: 'Get profile current user',
   })
-  @UseInterceptors(MongooseClassSerializerInterceptor(UserGetSerialization))
-  @ApiOkResponse({ type: UserGetSerialization })
+  @DocumentSerialization(UserGetSerialization)
   me(@Req() { user }: RequestWithUser) {
     return user;
   }
@@ -62,8 +56,7 @@ export class UsersController {
   @Get(':id')
   @Roles(ROLES.Admin)
   @UseGuards(RolesGuard)
-  @UseInterceptors(MongooseClassSerializerInterceptor(UserGetSerialization))
-  @ApiOkResponse({ type: UserGetSerialization })
+  @DocumentSerialization(UserGetSerialization)
   find(@Param('id', ParseMongoIdPipe) id: string) {
     return this.usersService.findOne(id);
   }

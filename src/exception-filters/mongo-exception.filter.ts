@@ -1,4 +1,4 @@
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
@@ -11,7 +11,7 @@ export class MongoExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const statusCode = HttpStatus.UNPROCESSABLE_ENTITY;
+    const statusCode = HttpStatus.BAD_REQUEST;
     let message = 'Internal server error';
 
     switch (exception.code) {
@@ -22,7 +22,7 @@ export class MongoExceptionFilter implements ExceptionFilter {
         message = ERRORS_DICTIONARY.DB_QUERY_FAIL;
     }
 
-    response.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+    response.status(HttpStatus.BAD_REQUEST).json({
       statusCode,
       message,
       error:
