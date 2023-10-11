@@ -5,7 +5,7 @@ import {
   UseInterceptors,
   applyDecorators,
 } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 
 export function PagingSerialization(classToIntercept: Type) {
   return applyDecorators(
@@ -16,6 +16,12 @@ export function PagingSerialization(classToIntercept: Type) {
     }),
     ApiOkResponse({
       type: classToIntercept,
+    }),
+    ApiQuery({
+      name: 'order',
+      type: 'string',
+      required: false,
+      example: 'id|asc',
     }),
   );
 }

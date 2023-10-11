@@ -33,6 +33,7 @@ import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
 import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
 import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
 import { PaginationService } from '../pagination/pagination.service';
+import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
 
 @Controller('users')
 @ApiTags('users')
@@ -67,6 +68,7 @@ export class UsersController {
   @PagingSerialization(UserPagingSerialization)
   async all(
     @Query(PaginationPagingPipe()) { page, per_page, limit, offset }: PaginationDto,
+    @Query('order', ParseOrderPipe) order: Record<string, any>,
   ): Promise<PaginateResponse<User>> {
     const count = await this.usersService.count();
     const users = await this.usersService.findAll(
@@ -75,6 +77,9 @@ export class UsersController {
         paging: {
           limit,
           offset,
+        },
+        order: {
+          ...order,
         },
       },
     );

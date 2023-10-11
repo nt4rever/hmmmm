@@ -11,18 +11,19 @@ export class MongoExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    const statusCode = HttpStatus.BAD_REQUEST;
+    let statusCode = HttpStatus.BAD_REQUEST;
     let message = 'Internal server error';
 
     switch (exception.code) {
       case 11000:
         message = ERRORS_DICTIONARY.DB_RECORD_DUPLICATE;
+        statusCode = HttpStatus.CONFLICT;
         break;
       case 31254:
         message = ERRORS_DICTIONARY.DB_QUERY_FAIL;
     }
 
-    response.status(HttpStatus.BAD_REQUEST).json({
+    response.status(statusCode).json({
       statusCode,
       message,
       error:
