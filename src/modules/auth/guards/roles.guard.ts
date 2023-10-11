@@ -1,5 +1,5 @@
 import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import { RequestWithUser } from '@custom-types/requests.type';
+import { RequestWithUser } from '@common/types/requests.type';
 import { IS_PUBLIC_KEY } from '@decorators/auth.decorator';
 import { ROLES_KEY } from '@decorators/roles.decorator';
 import {

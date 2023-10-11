@@ -18,18 +18,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@modules/*": ["src/modules/*"],
-      "@services/*": ["src/services/*"],
-      "@repositories/*": ["src/repositories/*"],
-      "@configs/*": ["src/configs/*"],
-      "@constraints/*": ["src/constraints/*"],
-      "@custom-types/*": ["src/types/*"],
-      "@exception-filters/*": ["src/exception-filters/*"],
-      "@interceptors/*": ["src/interceptors/*"],
-      "@pipes/*": ["src/pipes/*"],
-      "@decorators/*": ["src/decorators/*"],
-      "@utils/*": ["src/utils/*"],
-      "@common/*": ["src/common/*"]
+      "@*": ["src/*"],
     }
   }
 }

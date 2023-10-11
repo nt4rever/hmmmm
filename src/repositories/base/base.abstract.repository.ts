@@ -3,7 +3,7 @@ import {
   IDatabaseFindAllOptions,
   IDatabaseFindOneOptions,
   IDatabaseGetTotalOptions,
-} from '@modules/shared/interfaces/database.interface';
+} from '@common/interfaces/database.interface';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
 import { BaseRepositoryInterface } from './base.interface.repository';
 

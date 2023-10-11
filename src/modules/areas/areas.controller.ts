@@ -1,14 +1,14 @@
+import { ORDER_DIRECTION_TYPE } from '@common/interfaces';
 import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
 import {
   ApiFindAllQuery,
   FindAllSerialization,
 } from '@decorators/api-find-all.decorator';
 import { Public } from '@decorators/auth.decorator';
+import { DocumentSerialization } from '@decorators/document.decorator';
 import { Roles } from '@decorators/roles.decorator';
-import MongooseClassSerializerInterceptor from '@interceptors/mongoose-class-serializer.interceptor';
 import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
-import { ORDER_DIRECTION_TYPE } from '@modules/shared/interfaces';
 import { ROLES } from '@modules/users/entities';
 import {
   Body,
@@ -23,13 +23,10 @@ import {
   Post,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiNoContentResponse,
-  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -37,8 +34,9 @@ import { ParseFieldsPipe } from '@pipes/parse-fields.pipe';
 import { ParseMongoIdPipe } from '@pipes/parse-mongo-id.pipe';
 import { ParseOrderPipe } from '@pipes/parse-order.pipe';
 import { AreasService } from './areas.service';
+import { CreateAreaDoc } from './docs';
 import { CreateAreaDto, UpdateAreaDto } from './dto';
-import { AreaGetSerialization } from './serializations/area.get.serialization';
+import { AreaGetSerialization } from './serializations';
 
 @Controller('areas')
 @ApiTags('areas')
@@ -82,8 +80,7 @@ export class AreasController {
     summary: 'Public API',
   })
   @Public()
-  @UseInterceptors(MongooseClassSerializerInterceptor(AreaGetSerialization))
-  @ApiOkResponse({ type: AreaGetSerialization })
+  @DocumentSerialization(AreaGetSerialization)
   async get(@Param('id', ParseMongoIdPipe) id: string) {
     const area = await this.areasService.findOneByCondition({
       _id: id,
@@ -96,24 +93,7 @@ export class AreasController {
   }
 
   @Post()
-  @ApiOperation({
-    summary: 'Admin create area',
-  })
-  @ApiBody({
-    type: CreateAreaDto,
-    examples: {
-      area_1: {
-        value: {
-          name: 'VKU University',
-          address: '484 ĐT607, Điện Ngọc, Điện Bàn, Đà Nẵng 550000, Vietnam',
-          lat: 15.974597,
-          lng: 108.254675,
-          radius: 2000,
-        },
-      },
-    },
-  })
-  @ApiNoContentResponse()
+  @CreateAreaDoc()
   @HttpCode(HttpStatus.NO_CONTENT)
   async create(@Body() dto: CreateAreaDto) {
     await this.areasService.create(dto);

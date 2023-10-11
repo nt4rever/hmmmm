@@ -1,4 +1,9 @@
-import { JwtAccessTokenGuard } from '@modules/auth/guards/jwt-access-token.guard';
+import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
+import { Roles } from '@decorators/roles.decorator';
+import { AreasService } from '@modules/areas/areas.service';
+import { JwtAccessTokenGuard, RolesGuard } from '@modules/auth/guards';
+import { ROLES } from '@modules/users/entities';
+import { UsersService } from '@modules/users/users.service';
 import {
   Body,
   Controller,
@@ -8,20 +13,10 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiNoContentResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
-import { ManagersService } from './managers.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CreateManagerDoc } from './docs';
 import { CreateManagerDto } from './dto';
-import { AreasService } from '@modules/areas/areas.service';
-import { ERRORS_DICTIONARY } from '@constraints/error-dictionary.constraint';
-import { UsersService } from '@modules/users/users.service';
-import { ROLES } from '@modules/users/entities';
-import { RolesGuard } from '@modules/auth/guards/roles.guard';
-import { Roles } from '@decorators/roles.decorator';
+import { ManagersService } from './managers.service';
 
 @Controller('managers')
 @ApiTags('managers')
@@ -35,13 +30,10 @@ export class ManagersController {
   ) {}
 
   @Post()
-  @ApiOperation({
-    summary: 'Admin create Area manager',
-  })
-  @ApiNoContentResponse()
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @CreateManagerDoc()
   @Roles(ROLES.Admin)
   @UseGuards(RolesGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async create(@Body() dto: CreateManagerDto) {
     const area = await this.areasService.findOneByCondition({
       _id: dto.area_id,

@@ -1,5 +1,5 @@
 import { configSwagger } from '@configs/api-docs.config';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import * as morgan from 'morgan';
@@ -13,6 +13,7 @@ async function bootstrap() {
     new ValidationPipe({
       whitelist: true,
       transform: true,
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
     }),
   );
   app.setGlobalPrefix(configService.get('API_PREFIX'));
