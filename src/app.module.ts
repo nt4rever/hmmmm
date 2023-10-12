@@ -14,6 +14,7 @@ import { ManagersModule } from './modules/managers/managers.module';
 import { PaginationModule } from './modules/pagination/pagination.module';
 import { UsersModule } from './modules/users/users.module';
 import { VolunteersModule } from './modules/volunteers/volunteers.module';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -37,6 +38,11 @@ import { VolunteersModule } from './modules/volunteers/volunteers.module';
         AWS_S3_REGION: Joi.string().required(),
         AWS_ACCESS_KEY_ID: Joi.string().required(),
         AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+        MAIL_HOST: Joi.string().required(),
+        MAIL_USER: Joi.string().required(),
+        MAIL_PASSWORD: Joi.string().required(),
+        MAIL_FROM: Joi.string().required(),
+        MAIL_PORT: Joi.number().required(),
       }),
       validationOptions: {
         abortEarly: false,
@@ -55,9 +61,10 @@ import { VolunteersModule } from './modules/volunteers/volunteers.module';
       }),
       inject: [ConfigService],
     }),
+    AwsModule,
+    MailModule,
     UsersModule,
     AuthModule,
-    AwsModule,
     AreasModule,
     VolunteersModule,
     ManagersModule,

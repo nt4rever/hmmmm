@@ -1,7 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, {
+  CallbackWithoutResultAndOptionalError,
+  HydratedDocument,
+} from 'mongoose';
 import { RefreshToken, RefreshTokenSchema } from './refresh-token.entity';
 import { VotePerDay, VotePerDaySchema } from './vote-per-day.entity';
 import { Area } from '@/modules/areas/entities';
@@ -96,3 +99,9 @@ export class User extends BaseEntity {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.pre('save', function (next: CallbackWithoutResultAndOptionalError) {
+  this.email = this.email.trim().toLowerCase();
+
+  next();
+});

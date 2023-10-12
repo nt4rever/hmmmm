@@ -49,4 +49,8 @@ export abstract class BaseServiceAbstract<T extends BaseEntity>
   async remove(_id: string) {
     return await this.repository.softDelete(_id);
   }
+
+  async hardRemove(_id: string) {
+    return await this.repository.permanentlyDelete(_id);
+  }
 }

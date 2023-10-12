@@ -1,5 +1,6 @@
 import { PaginationDto } from '@/common/dto';
 import { RequestWithUser } from '@/common/types';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import { PagingSerialization } from '@/decorators/api-paging.decorator';
 import { Roles } from '@/decorators/roles.decorator';
 import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
@@ -8,9 +9,11 @@ import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -111,11 +114,11 @@ export class VolunteersController {
   }
 
   @Patch(':id')
-  @Roles(ROLES.AreaManager)
   @ApiOperation({
     summary: 'Admin area update volunteer information (location and is_active)',
   })
   @ApiNoContentResponse()
+  @Roles(ROLES.AreaManager)
   @UseGuards(RolesGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async update(
@@ -126,5 +129,24 @@ export class VolunteersController {
     const manager = await this.managerService.get(user.id);
     const volunteer = await this.volunteersService.get(id, manager.area);
     await this.volunteersService.update(volunteer, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Area manager soft delete volunteer' })
+  @ApiNoContentResponse()
+  @Roles(ROLES.AreaManager)
+  @UseGuards(RolesGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(
+    @Param('id', ParseMongoIdPipe) id: string,
+    @Req() { user }: RequestWithUser,
+  ) {
+    const manager = await this.managerService.get(user.id);
+
+    await this.volunteersService.get(id, manager.area);
+
+    if (!(await this.usersService.remove(id))) {
+      throw new NotFoundException(ERRORS_DICTIONARY.DELETE_FAIL);
+    }
   }
 }
