@@ -128,17 +128,15 @@ export class AuthService {
 
   generateAccessToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
-      privateKey: this.configService.get<string>('JWT_ACCESS_TOKEN_PRIVATE_KEY'),
-      expiresIn:
-        this.configService.get<string>('JWT_ACCESS_TOKEN_EXPIRATION_TIME') || '1h',
+      privateKey: this.configService.get<string>('jwt.access_private_key'),
+      expiresIn: this.configService.get<string>('jwt.access_expiration_time') || '1h',
     });
   }
 
   generateRefreshToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
-      privateKey: this.configService.get<string>('JWT_REFRESH_TOKEN_PRIVATE_KEY'),
-      expiresIn:
-        this.configService.get<string>('JWT_REFRESH_TOKEN_EXPIRATION_TIME') || '7d',
+      privateKey: this.configService.get<string>('jwt.refresh_private_key'),
+      expiresIn: this.configService.get<string>('jwt.refresh_expiration_time') || '7d',
     });
   }
 

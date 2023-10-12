@@ -10,14 +10,14 @@ export class AwsService {
     this.logger = new Logger(AwsService.name);
   }
 
-  private bucketName = this.configService.get<string>('AWS_S3_BUCKET');
+  private bucketName = this.configService.get<string>('aws.s3.bucket');
   private s3 = new S3({
-    endpoint: this.configService.get<string>('AWS_ENDPOINT'),
+    endpoint: this.configService.get<string>('aws.endpoint'),
     credentials: {
-      accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
-      secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY'),
+      accessKeyId: this.configService.get<string>('aws.credential.key'),
+      secretAccessKey: this.configService.get<string>('aws.credential.secret'),
     },
-    region: this.configService.get<string>('AWS_S3_REGION'),
+    region: this.configService.get<string>('aws.s3.region'),
     forcePathStyle: true,
   });
 
@@ -34,7 +34,7 @@ export class AwsService {
       }).done();
       return (
         data['Location'] ??
-        `${this.configService.get<string>('AWS_ENDPOINT')}/${this.bucketName}/${key}`
+        `${this.configService.get<string>('aws.s3.baseUrl')}/${this.bucketName}/${key}`
       );
     } catch (error) {
       throw error;
