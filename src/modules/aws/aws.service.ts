@@ -33,8 +33,7 @@ export class AwsService {
         },
       }).done();
       return (
-        data['Location'] ??
-        `${this.configService.get<string>('aws.s3.baseUrl')}/${this.bucketName}/${key}`
+        data['Location'] ?? `${this.configService.get<string>('aws.s3.baseUrl')}/${key}`
       );
     } catch (error) {
       throw error;
