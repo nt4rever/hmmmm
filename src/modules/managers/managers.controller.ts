@@ -5,6 +5,7 @@ import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -93,9 +94,9 @@ export class ManagersController {
   }
 
   @Patch(':id')
-  @Roles(ROLES.Admin)
   @ApiOperation({ summary: 'Admin update area manager' })
   @ApiNoContentResponse()
+  @Roles(ROLES.Admin)
   @UseGuards(RolesGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async update(@Param('id', ParseMongoIdPipe) id: string, @Body() dto: UpdateManagerDto) {
@@ -109,5 +110,26 @@ export class ManagersController {
     }
 
     await this.userService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Admin soft delete area manager' })
+  @ApiNoContentResponse()
+  @Roles(ROLES.Admin)
+  @UseGuards(RolesGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id', ParseMongoIdPipe) id: string) {
+    const manager = await this.userService.findOneByCondition({
+      _id: id,
+      role: ROLES.AreaManager,
+    });
+
+    if (!manager) {
+      throw new NotFoundException(ERRORS_DICTIONARY.USER_NOT_FOUND);
+    }
+
+    if (!(await this.userService.remove(id))) {
+      throw new NotFoundException(ERRORS_DICTIONARY.DELETE_FAIL);
+    }
   }
 }

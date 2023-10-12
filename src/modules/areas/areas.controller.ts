@@ -111,7 +111,7 @@ export class AreasController {
 
   @Delete(':id')
   @ApiOperation({
-    summary: 'Admin delete area',
+    summary: 'Admin soft delete area',
   })
   @ApiNoContentResponse()
   @HttpCode(HttpStatus.NO_CONTENT)
