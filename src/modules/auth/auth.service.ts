@@ -129,14 +129,14 @@ export class AuthService {
   generateAccessToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
       privateKey: this.configService.get<string>('jwt.access_private_key'),
-      expiresIn: this.configService.get<string>('jwt.access_expiration_time') || '1h',
+      expiresIn: this.configService.get<number>('jwt.access_expiration_time') || '1h',
     });
   }
 
   generateRefreshToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
       privateKey: this.configService.get<string>('jwt.refresh_private_key'),
-      expiresIn: this.configService.get<string>('jwt.refresh_expiration_time') || '7d',
+      expiresIn: this.configService.get<number>('jwt.refresh_expiration_time') || '7d',
     });
   }
 

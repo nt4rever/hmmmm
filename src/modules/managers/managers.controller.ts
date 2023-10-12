@@ -8,20 +8,29 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiNoContentResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AreasService } from '../areas/areas.service';
 import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
 import { ROLES } from '../users/entities';
 import { UserGetSerialization } from '../users/serializations';
 import { UsersService } from '../users/users.service';
 import { CreateManagerDoc } from './docs';
-import { CreateManagerDto } from './dto';
+import { CreateManagerDto, UpdateManagerDto } from './dto';
 import { ManagersService } from './managers.service';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 
 @Controller('managers')
 @ApiTags('managers')
@@ -81,5 +90,24 @@ export class ManagersController {
         },
       },
     );
+  }
+
+  @Patch(':id')
+  @Roles(ROLES.Admin)
+  @ApiOperation({ summary: 'Admin update area manager' })
+  @ApiNoContentResponse()
+  @UseGuards(RolesGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async update(@Param('id', ParseMongoIdPipe) id: string, @Body() dto: UpdateManagerDto) {
+    const manager = await this.userService.findOneByCondition({
+      _id: id,
+      role: ROLES.AreaManager,
+    });
+
+    if (!manager) {
+      throw new NotFoundException(ERRORS_DICTIONARY.USER_NOT_FOUND);
+    }
+
+    await this.userService.update(id, dto);
   }
 }
