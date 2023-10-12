@@ -1,9 +1,11 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseFilePipe,
   Patch,
@@ -19,7 +21,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { UpdateUserDto } from './dto';
+import { AdminUpdateUserDto, UpdateUserDto } from './dto';
 import { ROLES, User } from './entities';
 import { UserGetSerialization, UserPagingSerialization } from './serializations';
 import { UsersService } from './users.service';
@@ -34,6 +36,8 @@ import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
 import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
 import { PaginationService } from '../pagination/pagination.service';
 import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import * as argon2 from 'argon2';
 
 @Controller('users')
 @ApiTags('users')
@@ -55,6 +59,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Admin get detail user' })
   @Roles(ROLES.Admin)
   @UseGuards(RolesGuard)
   @DocumentSerialization(UserGetSerialization)
@@ -63,6 +68,7 @@ export class UsersController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Admin get all user (with paging)' })
   @Roles(ROLES.Admin)
   @UseGuards(RolesGuard)
   @PagingSerialization(UserPagingSerialization)
@@ -116,5 +122,34 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateProfile(@Body() dto: UpdateUserDto, @Req() { user }: RequestWithUser) {
     await this.usersService.update(user.id, dto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Admin update user (include password, status)' })
+  @ApiNoContentResponse()
+  @Roles(ROLES.Admin)
+  @UseGuards(RolesGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async adminUpdate(
+    @Param('id', ParseMongoIdPipe) id: string,
+    @Body() dto: AdminUpdateUserDto,
+    @Req() request: RequestWithUser,
+  ) {
+    const user = await this.usersService.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException(ERRORS_DICTIONARY.USER_NOT_FOUND);
+    }
+
+    if (user.id === request.user.id) {
+      throw new ConflictException(ERRORS_DICTIONARY.UPDATE_FAIL);
+    }
+
+    if (dto.password) {
+      const hashedPassword = await argon2.hash(dto.password);
+      dto.password = hashedPassword;
+    }
+
+    await this.usersService.update(id, dto);
   }
 }
