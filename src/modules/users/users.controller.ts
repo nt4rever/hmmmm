@@ -38,6 +38,8 @@ import { PaginationService } from '../pagination/pagination.service';
 import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
 import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import * as argon2 from 'argon2';
+import { MailService } from '../mail/mail.service';
+import { Public } from '@/decorators/auth.decorator';
 
 @Controller('users')
 @ApiTags('users')
@@ -47,6 +49,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly paginationService: PaginationService,
+    private readonly mailService: MailService,
   ) {}
 
   @Get('/me')
@@ -56,6 +59,12 @@ export class UsersController {
   @DocumentSerialization(UserGetSerialization)
   me(@Req() { user }: RequestWithUser) {
     return user;
+  }
+
+  @Public()
+  @Get('reset-password')
+  async requestResetPassword(@Query('email') email: string) {
+    this.mailService.resetPassword(email);
   }
 
   @Get(':id')
