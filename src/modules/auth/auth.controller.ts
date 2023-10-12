@@ -1,3 +1,4 @@
+import { RequestWithUser } from '@/common/types';
 import {
   Body,
   Controller,
@@ -11,16 +12,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { LogoutDoc, RefreshAccessTokenDoc, SignInDoc, SignUpDoc } from './docs';
 import { SignUpDto } from './dto';
 import { JwtAccessTokenGuard, JwtRefreshTokenGuard, LocalAuthGuard } from './guards';
-import { RequestWithUser } from '@/common/types';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post('sign-up')
   @SignUpDoc()
@@ -41,6 +45,7 @@ export class AuthController {
   @UseGuards(JwtRefreshTokenGuard)
   @HttpCode(HttpStatus.OK)
   async refreshAccessToken(@Req() request: RequestWithUser) {
+    await this.usersService.updateRefreshToken(request.user.id, request['tokenId']);
     const accessToken = this.authService.generateAccessToken({
       user_id: request.user.id,
       token_id: request['tokenId'],

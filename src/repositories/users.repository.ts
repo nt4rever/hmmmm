@@ -46,9 +46,7 @@ export class UsersRepository
           }
         : {
             $pull: {
-              refresh_token: {
-                _id: id,
-              },
+              refresh_token: { id },
             },
           };
       return await this.userModel.findOneAndUpdate(
@@ -56,6 +54,24 @@ export class UsersRepository
           _id: userId,
         },
         removeCondition,
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateRefreshToken(userId: string, id: string) {
+    try {
+      return await this.userModel.findOneAndUpdate(
+        {
+          _id: userId,
+          'refresh_token.id': id,
+        },
+        {
+          $set: {
+            'refresh_token.$.last_used_at': Date.now(),
+          },
+        },
       );
     } catch (error) {
       throw error;

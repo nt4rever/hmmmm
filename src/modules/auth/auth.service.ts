@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
-import mongoose from 'mongoose';
+import { randomUUID } from 'crypto';
 import { User } from '../users/entities';
 import { UsersService } from '../users/users.service';
 import { SignUpDto } from './dto';
@@ -147,7 +147,7 @@ export class AuthService {
     device_name?: string,
   ): Promise<{ token: string; tokenId: string }> {
     try {
-      const tokenId = new mongoose.Types.ObjectId().toString();
+      const tokenId = randomUUID();
       const token = this.generateRefreshToken({
         user_id: userId,
         token_id: tokenId,

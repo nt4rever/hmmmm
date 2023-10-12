@@ -35,6 +35,14 @@ export class UsersService extends BaseServiceAbstract<User> {
     }
   }
 
+  async updateRefreshToken(userId: string, tokenId: string) {
+    try {
+      await this.usersRepository.updateRefreshToken(userId, tokenId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async uploadAvatar(user: User, file: Express.Multer.File) {
     try {
       const key = `avatars/${user.id}/${randomUUID()}.${file.originalname
