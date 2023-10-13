@@ -1,5 +1,7 @@
 import { RequestWithUser } from '@/common/types';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,14 +11,17 @@ import {
   Post,
   Query,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
+import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { LogoutDoc, RefreshAccessTokenDoc, SignInDoc, SignUpDoc } from './docs';
-import { SignUpDto } from './dto';
+import { ChangePasswordDto, SignUpDto } from './dto';
 import { JwtAccessTokenGuard, JwtRefreshTokenGuard, LocalAuthGuard } from './guards';
+import { ROLES } from '../users/entities';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -37,6 +42,17 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   async signIn(@Req() request: RequestWithUser) {
+    return await this.authService.signIn(request.user.id);
+  }
+
+  @Post('sign-in-admin')
+  @SignInDoc()
+  @UseGuards(LocalAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async signAmin(@Req() request: RequestWithUser) {
+    if (![ROLES.Admin, ROLES.AreaManager].includes(request.user.role)) {
+      throw new UnauthorizedException();
+    }
     return await this.authService.signIn(request.user.id);
   }
 
@@ -64,5 +80,25 @@ export class AuthController {
     @Query('all_device', new ParseBoolPipe({ optional: true })) allDevice?: boolean,
   ) {
     await this.authService.logOut(request.user.id, request['tokenId'], allDevice);
+  }
+
+  @Post('change-password')
+  @ApiBearerAuth('token')
+  @ApiNoContentResponse()
+  @UseGuards(JwtAccessTokenGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async changePassword(@Body() dto: ChangePasswordDto, @Req() { user }: RequestWithUser) {
+    try {
+      await this.authService.verifyPlainContentWithHashedContent(
+        dto.old_password,
+        user.password,
+      );
+      const hashedPassword = await argon2.hash(dto.new_password);
+      await this.usersService.update(user.id, {
+        password: hashedPassword,
+      });
+    } catch (error) {
+      throw new BadRequestException(ERRORS_DICTIONARY.CHANGE_PASSWORD_FAIL);
+    }
   }
 }
