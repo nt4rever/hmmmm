@@ -163,10 +163,7 @@ export class AuthService {
     }
   }
 
-  private async verifyPlainContentWithHashedContent(
-    plainText: string,
-    hashedText: string,
-  ) {
+  async verifyPlainContentWithHashedContent(plainText: string, hashedText: string) {
     const isMatching = await argon2.verify(hashedText, plainText);
     if (!isMatching) {
       throw new UnauthorizedException();

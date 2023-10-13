@@ -1,3 +1,13 @@
+import { PaginationDto } from '@/common/dto';
+import { PaginateResponse, RequestWithUser } from '@/common/types';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import { ApiImageFile } from '@/decorators/api-file.decorator';
+import { PagingSerialization } from '@/decorators/api-paging.decorator';
+import { DocumentSerialization } from '@/decorators/document.decorator';
+import { Roles } from '@/decorators/roles.decorator';
+import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
+import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
+import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
 import {
   Body,
   ConflictException,
@@ -21,25 +31,14 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import * as argon2 from 'argon2';
+import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
+import { MailService } from '../mail/mail.service';
+import { PaginationService } from '../pagination/pagination.service';
 import { AdminUpdateUserDto, UpdateUserDto } from './dto';
 import { ROLES, User } from './entities';
 import { UserGetSerialization, UserPagingSerialization } from './serializations';
 import { UsersService } from './users.service';
-import { PaginationDto } from '@/common/dto';
-import { RequestWithUser, PaginateResponse } from '@/common/types';
-import { ApiImageFile } from '@/decorators/api-file.decorator';
-import { PagingSerialization } from '@/decorators/api-paging.decorator';
-import { DocumentSerialization } from '@/decorators/document.decorator';
-import { Roles } from '@/decorators/roles.decorator';
-import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
-import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
-import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
-import { PaginationService } from '../pagination/pagination.service';
-import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
-import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
-import * as argon2 from 'argon2';
-import { MailService } from '../mail/mail.service';
-import { Public } from '@/decorators/auth.decorator';
 
 @Controller('users')
 @ApiTags('users')
@@ -59,12 +58,6 @@ export class UsersController {
   @DocumentSerialization(UserGetSerialization)
   me(@Req() { user }: RequestWithUser) {
     return user;
-  }
-
-  @Public()
-  @Get('reset-password')
-  async requestResetPassword(@Query('email') email: string) {
-    this.mailService.resetPassword(email);
   }
 
   @Get(':id')
