@@ -17,7 +17,6 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
-  ParseFilePipe,
   Patch,
   Post,
   Query,
@@ -39,6 +38,7 @@ import { AdminUpdateUserDto, UpdateUserDto } from './dto';
 import { ROLES, User } from './entities';
 import { UserGetSerialization, UserPagingSerialization } from './serializations';
 import { UsersService } from './users.service';
+import { ParseFilePipe } from '@/pipes/parse-file.pipe';
 
 @Controller('users')
 @ApiTags('users')

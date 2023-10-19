@@ -15,6 +15,7 @@ import { PaginationModule } from './modules/pagination/pagination.module';
 import { UsersModule } from './modules/users/users.module';
 import { VolunteersModule } from './modules/volunteers/volunteers.module';
 import { MailModule } from './modules/mail/mail.module';
+import { TicketsModule } from './modules/tickets/tickets.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { MailModule } from './modules/mail/mail.module';
     VolunteersModule,
     ManagersModule,
     PaginationModule,
+    TicketsModule,
   ],
   controllers: [],
   providers: [
