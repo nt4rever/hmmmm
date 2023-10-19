@@ -1,4 +1,7 @@
 import { RequestWithUser } from '@/common/types';
+import { fileMimetypeFilter } from '@/filters/file-minetype.filter';
+import { ParseFilePipe } from '@/pipes/parse-file.pipe';
+import { InjectQueue } from '@nestjs/bullmq';
 import {
   Body,
   Controller,
@@ -18,12 +21,11 @@ import {
   ApiNoContentResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Queue } from 'bullmq';
+import { AreasService } from '../areas/areas.service';
 import { JwtAccessTokenGuard } from '../auth/guards';
 import { CreateTicketDto } from './dto';
 import { TicketsService } from './tickets.service';
-import { fileMimetypeFilter } from '@/filters/file-minetype.filter';
-import { ParseFilePipe } from '@/pipes/parse-file.pipe';
-import { AreasService } from '../areas/areas.service';
 
 @Controller('tickets')
 @ApiTags('tickets')
@@ -31,6 +33,8 @@ import { AreasService } from '../areas/areas.service';
 @UseGuards(JwtAccessTokenGuard)
 export class TicketsController {
   constructor(
+    @InjectQueue('image:upload')
+    private readonly imageUploadQueue: Queue,
     private readonly ticketsService: TicketsService,
     private readonly areasService: AreasService,
   ) {}
@@ -83,9 +87,9 @@ export class TicketsController {
       area,
       created_by: user,
     });
-    const imageUrls = await this.ticketsService.uploadImages(ticket.id, images);
-    await this.ticketsService.update(ticket.id, {
-      images: imageUrls,
+    await this.imageUploadQueue.add('upload-image', {
+      ticketId: ticket.id,
+      images,
     });
   }
 }

@@ -16,6 +16,7 @@ import { UsersModule } from './modules/users/users.module';
 import { VolunteersModule } from './modules/volunteers/volunteers.module';
 import { MailModule } from './modules/mail/mail.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -61,6 +62,15 @@ import { TicketsModule } from './modules/tickets/tickets.module';
         dbName: configService.get<string>('database.name'),
       }),
       inject: [ConfigService],
+    }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        connection: {
+          host: configService.get<string>('redis.host'),
+          port: configService.get<number>('redis.port'),
+        },
+      }),
     }),
     AwsModule,
     MailModule,

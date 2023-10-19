@@ -21,7 +21,7 @@ export class TicketsService extends BaseServiceAbstract<Ticket> {
         const key = `tickets/${ticketId}/${randomUUID()}.${file.originalname
           .split('.')
           .at(-1)}`;
-        return this.awsService.uploadPublicFile(file.buffer, key);
+        return this.awsService.uploadPublicFile(Buffer.from(file.buffer), key);
       });
 
       return await Promise.all(listUpload);

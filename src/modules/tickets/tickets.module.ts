@@ -6,6 +6,8 @@ import { TicketsController } from './tickets.controller';
 import { TicketsService } from './tickets.service';
 import { AwsModule } from '../aws/aws.module';
 import { AreasModule } from '../areas/areas.module';
+import { BullModule } from '@nestjs/bullmq';
+import { UploadImageProcessor } from './queues/ticket.processor';
 
 @Module({
   imports: [
@@ -19,6 +21,10 @@ import { AreasModule } from '../areas/areas.module';
         schema: EvidenceSchema,
       },
     ]),
+    BullModule.registerQueue({
+      name: 'image:upload',
+      prefix: 'ticket',
+    }),
     AwsModule,
     AreasModule,
   ],
@@ -29,6 +35,7 @@ import { AreasModule } from '../areas/areas.module';
       provide: 'TicketsRepositoryInterface',
       useClass: TicketsRepository,
     },
+    UploadImageProcessor,
   ],
 })
 export class TicketsModule {}
