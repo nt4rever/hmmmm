@@ -27,4 +27,19 @@ export class MailService {
       this.logger.error(error);
     }
   }
+
+  async ticketCreated(email: string, ticketId: string) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: '[RTS] Your report create successfully',
+        template: './ticket-created.hbs',
+        context: {
+          ticketId,
+        },
+      });
+    } catch (error) {
+      this.logger.error(error);
+    }
+  }
 }

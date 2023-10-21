@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
+import { MailService } from '@/modules/mail/mail.service';
+import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { TicketsService } from '../tickets.service';
@@ -26,30 +27,36 @@ export class UploadImageProcessor extends WorkerHost {
           this.logger.log('[JOB_SUCCESS] Upload ticket images to AWS success');
           return true;
         } catch (error) {
-          this.logger.log('[JOB_FAIL] Upload ticket images to AWS fail :((');
-          this.logger.debug(error);
-          return false;
+          throw error;
         }
 
       default:
         throw new Error('No job name match');
     }
   }
+}
 
-  @OnWorkerEvent('completed')
-  onQueueComplete(job: Job, result: any) {
-    this.logger.log(`Job has been finished: ${job.id}`);
+@Processor('mail')
+export class SendMailProcessor extends WorkerHost {
+  private logger = new Logger(UploadImageProcessor.name);
+
+  constructor(private readonly mailService: MailService) {
+    super();
   }
 
-  @OnWorkerEvent('failed')
-  onQueueFailed(job: Job, err: any) {
-    this.logger.log(`Job has been failed: ${job.id}`);
-    this.logger.log({ err });
-  }
+  async process(job: Job<any, any, string>, token?: string): Promise<any> {
+    switch (job.name) {
+      case 'ticket-created':
+        try {
+          await this.mailService.ticketCreated(job.data.email, job.data.ticketId);
+          this.logger.log('[JOB_SUCCESS] Send email create ticket successfully to user');
+          return true;
+        } catch (error) {
+          throw error;
+        }
 
-  @OnWorkerEvent('error')
-  onQueueError(err: any) {
-    this.logger.log(`Job has got error: `);
-    this.logger.log({ err });
+      default:
+        throw new Error('No job name match');
+    }
   }
 }

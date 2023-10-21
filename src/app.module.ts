@@ -17,6 +17,7 @@ import { VolunteersModule } from './modules/volunteers/volunteers.module';
 import { MailModule } from './modules/mail/mail.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { BullModule } from '@nestjs/bullmq';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { BullModule } from '@nestjs/bullmq';
         },
       }),
     }),
+    EventEmitterModule.forRoot(),
     AwsModule,
     MailModule,
     UsersModule,
