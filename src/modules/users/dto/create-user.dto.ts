@@ -45,7 +45,7 @@ export class CreateUserDto {
   gender?: GENDER;
 
   @IsOptional()
-  @MaxLength(50)
+  @MaxLength(100)
   address?: string;
 
   @IsOptional()

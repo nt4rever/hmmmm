@@ -15,6 +15,9 @@ import { PaginationModule } from './modules/pagination/pagination.module';
 import { UsersModule } from './modules/users/users.module';
 import { VolunteersModule } from './modules/volunteers/volunteers.module';
 import { MailModule } from './modules/mail/mail.module';
+import { TicketsModule } from './modules/tickets/tickets.module';
+import { BullModule } from '@nestjs/bullmq';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -61,6 +64,16 @@ import { MailModule } from './modules/mail/mail.module';
       }),
       inject: [ConfigService],
     }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        connection: {
+          host: configService.get<string>('redis.host'),
+          port: configService.get<number>('redis.port'),
+        },
+      }),
+    }),
+    EventEmitterModule.forRoot(),
     AwsModule,
     MailModule,
     UsersModule,
@@ -69,6 +82,7 @@ import { MailModule } from './modules/mail/mail.module';
     VolunteersModule,
     ManagersModule,
     PaginationModule,
+    TicketsModule,
   ],
   controllers: [],
   providers: [
