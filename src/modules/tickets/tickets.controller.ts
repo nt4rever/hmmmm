@@ -4,9 +4,12 @@ import { ParseFilePipe } from '@/pipes/parse-file.pipe';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
+  Query,
   Req,
   UploadedFiles,
   UseGuards,
@@ -14,13 +17,24 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AreasService } from '../areas/areas.service';
 import { JwtAccessTokenGuard } from '../auth/guards';
 import { CreateTicketDoc } from './docs';
 import { CreateTicketDto } from './dto';
 import { TicketsService } from './tickets.service';
 import { SendEmailTicketCreatedEvent, UploadTicketImageEvent } from './events';
+import { PaginationDto } from '@/common/dto';
+import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
+import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
+import { PaginationService } from '../pagination/pagination.service';
+import { Ticket } from './entities';
+import { PagingSerialization } from '@/decorators/api-paging.decorator';
+import { TicketPagingSerialization } from './serializations';
+import { Public } from '@/decorators/auth.decorator';
+import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
+import { DocumentSerialization } from '@/decorators/document.decorator';
+import { TicketGetSerialization } from './serializations/ticket.get.serialization';
 
 @Controller('tickets')
 @ApiTags('tickets')
@@ -28,6 +42,7 @@ import { SendEmailTicketCreatedEvent, UploadTicketImageEvent } from './events';
 @UseGuards(JwtAccessTokenGuard)
 export class TicketsController {
   constructor(
+    private readonly paginationService: PaginationService,
     private readonly eventEmitter: EventEmitter2,
     private readonly ticketsService: TicketsService,
     private readonly areasService: AreasService,
@@ -58,5 +73,67 @@ export class TicketsController {
       'ticket.send-mail',
       new SendEmailTicketCreatedEvent(user.email, ticket.id),
     );
+  }
+
+  @Get()
+  @Public()
+  @PagingSerialization(TicketPagingSerialization)
+  @ApiOperation({
+    summary: 'Public API',
+  })
+  async all(
+    @Query(PaginationPagingPipe()) { page, per_page, limit, offset }: PaginationDto,
+    @Query('order', ParseOrderPipe) order: Record<string, any>,
+  ) {
+    const count = await this.ticketsService.count();
+    const tickets = await this.ticketsService.findAll(
+      {},
+      {
+        join: [
+          {
+            path: 'created_by',
+            select: 'first_name last_name',
+          },
+          {
+            path: 'area',
+          },
+        ],
+        paging: {
+          limit,
+          offset,
+        },
+        order: {
+          ...order,
+        },
+      },
+    );
+    return this.paginationService.paginate<Ticket>(
+      {
+        page,
+        per_page,
+        count,
+      },
+      tickets,
+    );
+  }
+
+  @Get(':id')
+  @Public()
+  @ApiOperation({
+    summary: 'Public API',
+  })
+  @DocumentSerialization(TicketGetSerialization)
+  async get(@Param('id', ParseMongoIdPipe) id: string) {
+    return this.ticketsService.findOne(id, {
+      join: [
+        {
+          path: 'created_by',
+          select: 'first_name last_name',
+        },
+        {
+          path: 'area',
+        },
+      ],
+    });
   }
 }

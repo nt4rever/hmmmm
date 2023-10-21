@@ -7,6 +7,7 @@ export class UserPagingSerialization extends ResponsePagingSerialization {
   @Type(() => UserGetSerialization)
   @ApiProperty({
     type: UserGetSerialization,
+    isArray: true,
   })
   items: UserGetSerialization[];
 }

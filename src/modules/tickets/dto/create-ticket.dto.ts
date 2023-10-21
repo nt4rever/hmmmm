@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateTicketDto {
@@ -14,9 +15,11 @@ export class CreateTicketDto {
 
   @IsNotEmpty()
   @IsString()
+  @MaxLength(200)
   title: string;
 
   @IsOptional()
+  @MaxLength(500)
   description?: string;
 
   @IsNotEmpty()
