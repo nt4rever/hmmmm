@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Task, TaskSchema } from './entities';
 import { TasksRepository } from '@/repositories/task.repository';
+import { TicketsModule } from '../tickets/tickets.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TasksRepository } from '@/repositories/task.repository';
         schema: TaskSchema,
       },
     ]),
+    forwardRef(() => TicketsModule),
   ],
   controllers: [TasksController],
   providers: [
@@ -22,5 +24,6 @@ import { TasksRepository } from '@/repositories/task.repository';
       useClass: TasksRepository,
     },
   ],
+  exports: [TasksService],
 })
 export class TasksModule {}

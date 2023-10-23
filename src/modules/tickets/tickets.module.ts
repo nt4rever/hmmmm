@@ -9,6 +9,9 @@ import { AreasModule } from '../areas/areas.module';
 import { BullModule } from '@nestjs/bullmq';
 import { SendMailProcessor, UploadImageProcessor } from './queues/ticket.processor';
 import { EvidencesRepository } from '@/repositories/evidence.repository';
+import { VolunteersModule } from '../volunteers/volunteers.module';
+import { TasksModule } from '../tasks/tasks.module';
+import { EvidencesService } from './evidences.service';
 
 @Module({
   imports: [
@@ -34,10 +37,13 @@ import { EvidencesRepository } from '@/repositories/evidence.repository';
     ),
     AwsModule,
     AreasModule,
+    VolunteersModule,
+    TasksModule,
   ],
   controllers: [TicketsController],
   providers: [
     TicketsService,
+    EvidencesService,
     {
       provide: 'TicketsRepositoryInterface',
       useClass: TicketsRepository,
@@ -49,5 +55,6 @@ import { EvidencesRepository } from '@/repositories/evidence.repository';
     UploadImageProcessor,
     SendMailProcessor,
   ],
+  exports: [TicketsService, EvidencesService],
 })
 export class TicketsModule {}

@@ -1,29 +1,47 @@
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import { BaseServiceAbstract } from '@/services/base';
-import { Inject, Injectable } from '@nestjs/common';
-import { Ticket } from './entities';
-import { TicketsRepository } from '@/repositories/ticket.repository';
-import { AwsService } from '../aws/aws.service';
-import { randomUUID } from 'crypto';
-import { OnEvent } from '@nestjs/event-emitter';
-import { SendEmailTicketCreatedEvent, UploadTicketImageEvent } from './events';
 import { InjectQueue } from '@nestjs/bullmq';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { Queue } from 'bullmq';
-import { EvidencesRepository } from '@/repositories/evidence.repository';
+import { Area } from '../areas/entities';
+import { Ticket } from './entities';
+import {
+  AddEvidenceEvent,
+  SendEmailTicketCreatedEvent,
+  UploadEvidenceImageEvent,
+  UploadTicketImageEvent,
+} from './events';
+import { TicketsRepositoryInterface } from './interfaces';
 
 @Injectable()
 export class TicketsService extends BaseServiceAbstract<Ticket> {
+  private logger: Logger = new Logger(TicketsService.name);
+
   constructor(
     @Inject('TicketsRepositoryInterface')
-    private readonly ticketsRepository: TicketsRepository,
-    @Inject('EvidencesRepositoryInterface')
-    private readonly evidencesRepository: EvidencesRepository,
-    private readonly awsService: AwsService,
+    private readonly ticketsRepository: TicketsRepositoryInterface,
     @InjectQueue('image:upload')
     private readonly imageUploadQueue: Queue,
     @InjectQueue('mail')
     private readonly mailQueue: Queue,
   ) {
     super(ticketsRepository);
+  }
+
+  async getByArea(id: string, area: Area) {
+    try {
+      const ticket = await this.findOneByCondition({
+        _id: id,
+        area,
+      });
+      if (!ticket) {
+        throw new NotFoundException(ERRORS_DICTIONARY.TICKET_NOT_FOUND);
+      }
+      return ticket;
+    } catch (error) {
+      throw error;
+    }
   }
 
   @OnEvent('ticket.upload-image')
@@ -38,18 +56,19 @@ export class TicketsService extends BaseServiceAbstract<Ticket> {
     this.mailQueue.add('ticket-created', payload, { removeOnComplete: true });
   }
 
-  async uploadImages(ticketId: string, files: Express.Multer.File[]) {
-    try {
-      const listUpload = files.map((file) => {
-        const key = `tickets/${ticketId}/${randomUUID()}.${file.originalname
-          .split('.')
-          .at(-1)}`;
-        return this.awsService.uploadPublicFile(Buffer.from(file.buffer), key);
-      });
+  @OnEvent('evidence.upload-image')
+  handleUploadEvidenceImage(payload: UploadEvidenceImageEvent) {
+    this.imageUploadQueue.add('upload-image-evidence', payload, {
+      removeOnComplete: true,
+    });
+  }
 
-      return await Promise.all(listUpload);
+  @OnEvent('ticket.add-evidence', { async: true })
+  async handleAddEvidence({ ticketId, evidenceId, type }: AddEvidenceEvent) {
+    try {
+      await this.ticketsRepository.addEvidence(ticketId, evidenceId, type);
     } catch (error) {
-      throw error;
+      this.logger.error(error);
     }
   }
 }

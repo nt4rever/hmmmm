@@ -8,5 +8,6 @@ import { ManagersModule } from '../managers/managers.module';
   imports: [UsersModule, ManagersModule],
   controllers: [VolunteersController],
   providers: [VolunteersService],
+  exports: [VolunteersService],
 })
 export class VolunteersModule {}
