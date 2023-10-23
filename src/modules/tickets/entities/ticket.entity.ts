@@ -3,7 +3,7 @@ import { BaseEntity } from '@/modules/shared/base';
 import { User } from '@/modules/users/entities';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Evidence } from './evidence';
+import { Evidence } from './evidence.entity';
 
 export enum TICKET_STATUS {
   NEW = 'NEW',

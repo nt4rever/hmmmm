@@ -1,2 +1,2 @@
-export * from './ticket';
-export * from './evidence';
+export * from './ticket.entity';
+export * from './evidence.entity';
