@@ -52,14 +52,14 @@ export function SignUpDoc() {
           examples: {
             invalid_email_password: {
               value: {
-                statusCode: 400,
+                statusCode: 422,
                 message: ERRORS_DICTIONARY.VALIDATION_ERROR,
                 error: ['email must be an email', 'password is not strong enough'],
               },
             },
             some_fields_missing: {
               value: {
-                statusCode: 400,
+                statusCode: 422,
                 message: ERRORS_DICTIONARY.VALIDATION_ERROR,
                 error: [
                   'last_name must be shorter than or equal to 50 characters',
