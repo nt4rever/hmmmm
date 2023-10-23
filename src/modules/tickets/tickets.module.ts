@@ -8,6 +8,7 @@ import { AwsModule } from '../aws/aws.module';
 import { AreasModule } from '../areas/areas.module';
 import { BullModule } from '@nestjs/bullmq';
 import { SendMailProcessor, UploadImageProcessor } from './queues/ticket.processor';
+import { EvidencesRepository } from '@/repositories/evidence.repository';
 
 @Module({
   imports: [
@@ -40,6 +41,10 @@ import { SendMailProcessor, UploadImageProcessor } from './queues/ticket.process
     {
       provide: 'TicketsRepositoryInterface',
       useClass: TicketsRepository,
+    },
+    {
+      provide: 'EvidencesRepositoryInterface',
+      useClass: EvidencesRepository,
     },
     UploadImageProcessor,
     SendMailProcessor,

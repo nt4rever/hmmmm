@@ -8,12 +8,15 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { SendEmailTicketCreatedEvent, UploadTicketImageEvent } from './events';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { EvidencesRepository } from '@/repositories/evidence.repository';
 
 @Injectable()
 export class TicketsService extends BaseServiceAbstract<Ticket> {
   constructor(
     @Inject('TicketsRepositoryInterface')
     private readonly ticketsRepository: TicketsRepository,
+    @Inject('EvidencesRepositoryInterface')
+    private readonly evidencesRepository: EvidencesRepository,
     private readonly awsService: AwsService,
     @InjectQueue('image:upload')
     private readonly imageUploadQueue: Queue,
