@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AwsService {
@@ -50,6 +51,21 @@ export class AwsService {
       );
     } catch (error) {
       this.logger.error(error);
+    }
+  }
+
+  async uploadMultipleFile(folderName: string, files: Express.Multer.File[]) {
+    try {
+      const listUpload = files.map((file) => {
+        const key = `${folderName}/${randomUUID()}.${file.originalname
+          .split('.')
+          .at(-1)}`;
+        return this.uploadPublicFile(Buffer.from(file.buffer), key);
+      });
+
+      return await Promise.all(listUpload);
+    } catch (error) {
+      throw error;
     }
   }
 }

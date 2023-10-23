@@ -23,7 +23,7 @@ export class TicketGetSerialization extends ResponseIdSerialization {
   @ApiProperty({
     type: CreatedBySerialization,
   })
-  user: User;
+  created_by: User;
 
   @ApiProperty()
   title: string;

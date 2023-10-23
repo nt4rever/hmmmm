@@ -4,12 +4,18 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { TicketsService } from '../tickets.service';
+import { AwsService } from '@/modules/aws/aws.service';
+import { EvidencesService } from '../evidences.service';
 
 @Processor('image:upload')
 export class UploadImageProcessor extends WorkerHost {
   private logger = new Logger(UploadImageProcessor.name);
 
-  constructor(private readonly ticketsService: TicketsService) {
+  constructor(
+    private readonly ticketsService: TicketsService,
+    private readonly evidencesService: EvidencesService,
+    private readonly awsService: AwsService,
+  ) {
     super();
   }
 
@@ -17,8 +23,8 @@ export class UploadImageProcessor extends WorkerHost {
     switch (job.name) {
       case 'upload-image':
         try {
-          const imageUrls = await this.ticketsService.uploadImages(
-            job.data.ticketId,
+          const imageUrls = await this.awsService.uploadMultipleFile(
+            `tickets/${job.data.ticketId}`,
             job.data.images,
           );
           await this.ticketsService.update(job.data.ticketId, {
@@ -29,6 +35,16 @@ export class UploadImageProcessor extends WorkerHost {
         } catch (error) {
           throw error;
         }
+
+      case 'upload-image-evidence':
+        const imageUrls = await this.awsService.uploadMultipleFile(
+          `evidences/${job.data.ticketId}/${job.data.evidenceId}`,
+          job.data.images,
+        );
+        await this.evidencesService.update(job.data.evidenceId, {
+          images: imageUrls,
+        });
+        this.logger.log('[JOB_SUCCESS] Upload evidence images to AWS success');
 
       default:
         throw new Error('No job name match');
