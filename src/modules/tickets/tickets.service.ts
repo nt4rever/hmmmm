@@ -27,6 +27,8 @@ export class TicketsService extends BaseServiceAbstract<Ticket> {
     private readonly imageUploadQueue: Queue,
     @InjectQueue('mail')
     private readonly mailQueue: Queue,
+    @InjectQueue('assign-task')
+    private readonly assignTaskQueue: Queue,
   ) {
     super(ticketsRepository);
   }
@@ -96,8 +98,19 @@ export class TicketsService extends BaseServiceAbstract<Ticket> {
         );
 
         if (distance <= ticket.area.radius) {
-          // TBD
-          this.logger.log('Task is assigning...');
+          this.assignTaskQueue.add(
+            'assign-task',
+            {
+              ticketId,
+              location: {
+                lat: ticket.lat,
+                lng: ticket.lng,
+              },
+            },
+            {
+              removeOnComplete: true,
+            },
+          );
         } else {
           this.logger.debug(distance);
           this.logger.error('The location of the report is out of area');

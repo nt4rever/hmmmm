@@ -42,4 +42,19 @@ export class MailService {
       this.logger.error(error);
     }
   }
+
+  async ticketAssigned(email: string, ticketId: string) {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: '[RTS] You has been assigned to the ticket',
+        template: './ticket-assigned.hbs',
+        context: {
+          ticketId,
+        },
+      });
+    } catch (error) {
+      this.logger.error(error);
+    }
+  }
 }
