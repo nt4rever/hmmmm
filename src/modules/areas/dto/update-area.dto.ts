@@ -1,8 +1,8 @@
-import { PartialType } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { CreateAreaDto } from './create-area.dto';
 import { IsBoolean, IsNumber, IsOptional, Max, Min } from 'class-validator';
 
-export class UpdateAreaDto extends PartialType(CreateAreaDto) {
+export class UpdateAreaDto extends PartialType(OmitType(CreateAreaDto, ['radius'])) {
   @IsOptional()
   @IsNumber()
   @Min(0)
