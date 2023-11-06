@@ -7,7 +7,11 @@ import { TicketsService } from './tickets.service';
 import { AwsModule } from '../aws/aws.module';
 import { AreasModule } from '../areas/areas.module';
 import { BullModule } from '@nestjs/bullmq';
-import { SendMailProcessor, UploadImageProcessor } from './queues/ticket.processor';
+import {
+  AssignTaskProcessor,
+  SendMailProcessor,
+  UploadImageProcessor,
+} from './queues/ticket.processor';
 import { EvidencesRepository } from '@/repositories/evidence.repository';
 import { VolunteersModule } from '../volunteers/volunteers.module';
 import { TasksModule } from '../tasks/tasks.module';
@@ -34,6 +38,10 @@ import { EvidencesService } from './evidences.service';
         name: 'mail',
         prefix: 'ticket',
       },
+      {
+        name: 'assign-task',
+        prefix: 'ticket',
+      },
     ),
     AwsModule,
     AreasModule,
@@ -54,6 +62,7 @@ import { EvidencesService } from './evidences.service';
     },
     UploadImageProcessor,
     SendMailProcessor,
+    AssignTaskProcessor,
   ],
   exports: [TicketsService, EvidencesService],
 })

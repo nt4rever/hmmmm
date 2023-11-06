@@ -30,7 +30,11 @@ import {
   UpdateTicketDto,
 } from './dto';
 import { TicketsService } from './tickets.service';
-import { SendEmailTicketCreatedEvent, UploadTicketImageEvent } from './events';
+import {
+  AssignTaskEvent,
+  SendEmailTicketCreatedEvent,
+  UploadTicketImageEvent,
+} from './events';
 import { PaginationDto } from '@/common/dto';
 import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
 import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
@@ -87,6 +91,7 @@ export class TicketsController {
       'ticket.send-mail',
       new SendEmailTicketCreatedEvent(user.email, ticket.id),
     );
+    this.eventEmitter.emit('ticket.assign-task', new AssignTaskEvent(ticket.id));
   }
 
   @Get()
