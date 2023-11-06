@@ -8,11 +8,13 @@ import { Area } from '../areas/entities';
 import { Ticket } from './entities';
 import {
   AddEvidenceEvent,
+  AssignTaskEvent,
   SendEmailTicketCreatedEvent,
   UploadEvidenceImageEvent,
   UploadTicketImageEvent,
 } from './events';
 import { TicketsRepositoryInterface } from './interfaces';
+import { getDistance } from 'geolib';
 
 @Injectable()
 export class TicketsService extends BaseServiceAbstract<Ticket> {
@@ -67,6 +69,40 @@ export class TicketsService extends BaseServiceAbstract<Ticket> {
   async handleAddEvidence({ ticketId, evidenceId, type }: AddEvidenceEvent) {
     try {
       await this.ticketsRepository.addEvidence(ticketId, evidenceId, type);
+    } catch (error) {
+      this.logger.error(error);
+    }
+  }
+
+  @OnEvent('ticket.assign-task', { async: true })
+  async handleAssignTask({ ticketId }: AssignTaskEvent) {
+    try {
+      // If the location of the report is out of area => bypass
+      const ticket = await this.findOne(ticketId, {
+        join: {
+          path: 'area',
+        },
+      });
+      if (ticket && ticket.area) {
+        const distance = getDistance(
+          {
+            lat: ticket.lat,
+            lng: ticket.lng,
+          },
+          {
+            lat: ticket.area.lat,
+            lng: ticket.area.lng,
+          },
+        );
+
+        if (distance <= ticket.area.radius) {
+          // TBD
+          this.logger.log('Task is assigning...');
+        } else {
+          this.logger.debug(distance);
+          this.logger.error('The location of the report is out of area');
+        }
+      }
     } catch (error) {
       this.logger.error(error);
     }
