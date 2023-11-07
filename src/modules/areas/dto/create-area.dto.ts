@@ -14,7 +14,7 @@ export class CreateAreaDto {
   name: string;
 
   @IsNotEmpty()
-  @MaxLength(1000)
+  @MaxLength(200)
   address: string;
 
   @IsNotEmpty()

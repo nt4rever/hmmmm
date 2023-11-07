@@ -23,6 +23,6 @@ export class UpdateUserDto {
   gender?: GENDER;
 
   @IsOptional()
-  @MaxLength(50)
+  @MaxLength(200)
   address?: string;
 }
