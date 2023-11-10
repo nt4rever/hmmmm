@@ -76,7 +76,11 @@ export class SendMailProcessor extends WorkerHost {
         }
       case 'ticket-assigned':
         try {
-          await this.mailService.ticketAssigned(job.data.email, job.data.ticketId);
+          await this.mailService.ticketAssigned(
+            job.data.email,
+            job.data.ticketId,
+            job.data.taskId,
+          );
           this.logger.log('[JOB_SUCCESS] Send email assign ticket successfully to user');
           return true;
         } catch (error) {
@@ -124,6 +128,7 @@ export class AssignTaskProcessor extends WorkerHost {
           }
 
           let assigneeEmail: string = null;
+          let assignTaskId: string = null;
 
           for (const volunteer of volunteers) {
             const tasks = await this.tasksService.count({
@@ -135,7 +140,7 @@ export class AssignTaskProcessor extends WorkerHost {
             //  If a volunteer has too many tasks (status = PENDING) then iterate on to the next volunteer
             if (tasks <= this.configService.get<number>('ticket.max_task')) {
               // Create a new task and assign to this volunteer (deadline 6h hours)
-              await this.tasksService.create({
+              const taskAssign = await this.tasksService.create({
                 ticket,
                 assignee: volunteer,
                 expires_at:
@@ -143,18 +148,20 @@ export class AssignTaskProcessor extends WorkerHost {
                   3600 * 1000 * this.configService.get<number>('ticket.task_expires_at'),
               });
               assigneeEmail = volunteer.email;
+              assignTaskId = taskAssign._id.toString();
               break;
             }
           }
 
           // If all volunteers are busy, assign a task to the first volunteer
           if (!assigneeEmail) {
-            await this.tasksService.create({
+            const taskAssign = await this.tasksService.create({
               ticket,
               assignee: volunteers[0],
               expires_at: Date.now() + 3600 * 1000 * 6,
             });
             assigneeEmail = volunteers[0].email;
+            assignTaskId = taskAssign._id.toString();
           }
 
           this.mailQueue.add(
@@ -162,6 +169,7 @@ export class AssignTaskProcessor extends WorkerHost {
             {
               ticketId: ticket.id,
               email: assigneeEmail,
+              taskId: assignTaskId,
             },
             { removeOnComplete: true },
           );

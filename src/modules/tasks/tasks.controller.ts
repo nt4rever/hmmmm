@@ -96,10 +96,14 @@ export class TasksController {
             populate: [
               { path: 'area' },
               { path: 'created_by', select: 'first_name last_name' },
+              {
+                path: 'evidences',
+                populate: {
+                  path: 'created_by',
+                  select: 'first_name last_name',
+                },
+              },
             ],
-            select: {
-              evidences: 0,
-            },
           },
         ],
         select: {

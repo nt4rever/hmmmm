@@ -30,12 +30,13 @@ export class MailService {
 
   async ticketCreated(email: string, ticketId: string) {
     try {
+      const url = `${process.env.APP_URL}/report/${ticketId}`;
       await this.mailerService.sendMail({
         to: email,
         subject: '[RTS] Your report create successfully',
         template: './ticket-created.hbs',
         context: {
-          ticketId,
+          url,
         },
       });
     } catch (error) {
@@ -43,14 +44,16 @@ export class MailService {
     }
   }
 
-  async ticketAssigned(email: string, ticketId: string) {
+  async ticketAssigned(email: string, ticketId: string, taskId: string) {
     try {
+      const url = `${process.env.APP_URL}/tasks/${taskId}`;
       await this.mailerService.sendMail({
         to: email,
         subject: '[RTS] You has been assigned to the ticket',
         template: './ticket-assigned.hbs',
         context: {
           ticketId,
+          url,
         },
       });
     } catch (error) {
