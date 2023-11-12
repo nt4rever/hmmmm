@@ -1,10 +1,13 @@
+import { PaginationDto } from '@/common/dto';
 import { RequestWithUser } from '@/common/types';
 import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
-import { FindAllSerialization } from '@/decorators/api-find-all.decorator';
+import { PagingSerialization } from '@/decorators/api-paging.decorator';
 import { DocumentSerialization } from '@/decorators/document.decorator';
 import { Roles } from '@/decorators/roles.decorator';
 import { fileMimetypeFilter } from '@/filters/file-minetype.filter';
+import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
 import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
+import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
 import {
   Body,
   Controller,
@@ -16,6 +19,7 @@ import {
   ParseFilePipe,
   Patch,
   Post,
+  Query,
   Req,
   UploadedFiles,
   UseGuards,
@@ -25,13 +29,14 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
+import { PaginationService } from '../pagination/pagination.service';
 import { AddEvidenceEvent, UploadEvidenceImageEvent } from '../tickets/events';
 import { EvidencesService } from '../tickets/evidences.service';
 import { ROLES } from '../users/entities';
 import { UpdateTaskDoc } from './docs';
-import { UpdateTaskDto } from './dto';
+import { FilterTaskDto, UpdateTaskDto } from './dto';
 import { TASK_STATUS } from './entities';
-import { TaskGetSerialization } from './serializations';
+import { TaskGetSerialization, TaskPagingSerialization } from './serializations';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
@@ -43,6 +48,7 @@ export class TasksController {
     private readonly eventEmitter: EventEmitter2,
     private readonly tasksService: TasksService,
     private readonly evidencesService: EvidencesService,
+    private readonly paginationService: PaginationService,
   ) {}
 
   @Get()
@@ -51,14 +57,21 @@ export class TasksController {
   })
   @Roles(ROLES.Volunteer)
   @UseGuards(RolesGuard)
-  @FindAllSerialization({
-    classToIntercept: TaskGetSerialization,
-    isArray: true,
-  })
-  async all(@Req() { user }: RequestWithUser) {
-    return await this.tasksService.findAll(
+  @PagingSerialization(TaskPagingSerialization)
+  async all(
+    @Query(PaginationPagingPipe()) { page, per_page, limit, offset }: PaginationDto,
+    @Query('order', ParseOrderPipe) order: Record<string, any>,
+    @Query() filter: FilterTaskDto,
+    @Req() { user }: RequestWithUser,
+  ) {
+    const count = await this.tasksService.count({
+      assignee: user,
+      ...filter,
+    });
+    const tasks = await this.tasksService.findAll(
       {
         assignee: user,
+        ...filter,
       },
       {
         join: {
@@ -72,7 +85,22 @@ export class TasksController {
         select: {
           assignee: 0,
         },
+        paging: {
+          limit,
+          offset,
+        },
+        order: {
+          ...order,
+        },
       },
+    );
+    return this.paginationService.paginate(
+      {
+        page,
+        per_page,
+        count,
+      },
+      tasks,
     );
   }
 
