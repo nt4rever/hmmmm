@@ -112,8 +112,9 @@ export class TicketsService extends BaseServiceAbstract<Ticket> {
             },
           );
         } else {
-          this.logger.debug(distance);
-          this.logger.error('The location of the report is out of area');
+          this.logger.error(
+            `The location of the report is out of area (about ${distance}m)`,
+          );
         }
       }
     } catch (error) {

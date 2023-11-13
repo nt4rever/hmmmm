@@ -2,6 +2,7 @@ import { RequestWithUser } from '@/common/types';
 import { fileMimetypeFilter } from '@/filters/file-minetype.filter';
 import { ParseFilePipe } from '@/pipes/parse-file.pipe';
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -51,6 +52,7 @@ import { ROLES } from '../users/entities';
 import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import { VolunteersService } from '../volunteers/volunteers.service';
 import { TasksService } from '../tasks/tasks.service';
+import { UsersService } from '../users/users.service';
 
 @Controller('tickets')
 @ApiTags('tickets')
@@ -64,6 +66,7 @@ export class TicketsController {
     private readonly areasService: AreasService,
     private readonly volunteersService: VolunteersService,
     private readonly tasksService: TasksService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Post()
@@ -77,6 +80,10 @@ export class TicketsController {
     @Body() dto: CreateTicketDto,
     @Req() { user }: RequestWithUser,
   ) {
+    const canCreateTicket = await this.usersService.canCreateTicket(user);
+    if (!canCreateTicket) {
+      throw new BadRequestException(ERRORS_DICTIONARY.MAX_TICKER_PER_DAY);
+    }
     const area = await this.areasService.get(dto.area_id);
     const ticket = await this.ticketsService.create({
       ...dto,

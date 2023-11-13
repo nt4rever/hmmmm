@@ -16,6 +16,7 @@ import { EvidencesRepository } from '@/repositories/evidence.repository';
 import { VolunteersModule } from '../volunteers/volunteers.module';
 import { TasksModule } from '../tasks/tasks.module';
 import { EvidencesService } from './evidences.service';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { EvidencesService } from './evidences.service';
     AreasModule,
     VolunteersModule,
     TasksModule,
+    UsersModule,
   ],
   controllers: [TicketsController],
   providers: [
