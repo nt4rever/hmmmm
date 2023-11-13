@@ -4,6 +4,7 @@ import { GENDER, ROLES, RefreshToken, VotePerDay } from '../entities';
 import { ResponseIdSerialization } from '@/common/serializations';
 import { getAvatarUrl } from '@/utils/getAvatarUrl';
 import { Location } from '@/modules/shared/base';
+import { TicketPerDay } from '../entities/ticker-per-day.entity';
 
 export class UserGetSerialization extends ResponseIdSerialization {
   @ApiPropertyOptional()
@@ -41,6 +42,10 @@ export class UserGetSerialization extends ResponseIdSerialization {
   @ApiPropertyOptional()
   @Type(() => VotePerDay)
   vote_per_day?: VotePerDay;
+
+  @ApiPropertyOptional()
+  @Type(() => TicketPerDay)
+  ticket_per_day?: TicketPerDay;
 
   @Exclude()
   @ApiHideProperty()
