@@ -3,6 +3,7 @@ import { Ticket } from '@/modules/tickets/entities';
 import { User } from '@/modules/users/entities';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Vote } from './vote.entity';
 
 export type CommentDocument = HydratedDocument<Comment>;
 
@@ -39,6 +40,12 @@ export class Comment extends BaseEntity {
     default: 0,
   })
   score: number;
+
+  @Prop({
+    required: true,
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Vote' }],
+  })
+  voted_by: Vote[];
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);

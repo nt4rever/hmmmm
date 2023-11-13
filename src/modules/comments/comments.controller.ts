@@ -80,6 +80,7 @@ export class CommentsController {
         },
         select: {
           ticket: 0,
+          voted_by: 0,
         },
         paging: {
           limit,
@@ -119,6 +120,7 @@ export class CommentsController {
     await this.commentsService.update(id, {
       score: comment.score + (dto.upVote ? 1 : -1),
     });
+    await this.commentsService.addVotedBy(id, user);
   }
 
   @Post(':id/vote-ticket')
