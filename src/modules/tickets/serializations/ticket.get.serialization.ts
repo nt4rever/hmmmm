@@ -7,9 +7,10 @@ import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { TICKET_STATUS } from '../entities';
 
-class CreatedBySerialization extends PickType(UserGetSerialization, [
+export class CreatedBySerialization extends PickType(UserGetSerialization, [
   'first_name',
   'last_name',
+  'role',
 ]) {}
 
 export class TicketGetSerialization extends ResponseIdSerialization {

@@ -98,4 +98,31 @@ export class UsersService extends BaseServiceAbstract<User> {
       throw error;
     }
   }
+
+  async canVote(user: User) {
+    try {
+      let point = 10;
+
+      if (user.vote_per_day) {
+        const diff = Date.now() - user.vote_per_day.last_used_at.getTime();
+        if (diff > 1000 * 60 * 60 * 24) {
+          point = 10;
+        } else {
+          point = user.vote_per_day.point;
+        }
+      }
+
+      if (point === 0) return false;
+
+      await this.usersRepository.update(user.id, {
+        vote_per_day: {
+          point: point - 1,
+          last_used_at: new Date(),
+        },
+      });
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
