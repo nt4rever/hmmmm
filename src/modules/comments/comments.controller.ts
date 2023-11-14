@@ -20,7 +20,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNoContentResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from '../auth/guards';
 import { PaginationService } from '../pagination/pagination.service';
 import { TicketsService } from '../tickets/tickets.service';
@@ -58,11 +58,17 @@ export class CommentsController {
   @Get(':ticketId')
   @Public()
   @PagingSerialization(CommentPagingSerialization)
+  @ApiQuery({
+    name: 'user',
+    type: String,
+    required: false,
+  })
   async all(
     @Query(PaginationPagingPipe()) { page, per_page, limit, offset }: PaginationDto,
     @Query('order', ParseOrderPipe) order: Record<string, any>,
     @Query() filter: FilterCommentDto,
     @Param('ticketId', ParseMongoIdPipe) ticketId: string,
+    @Query('user') user?: string,
   ) {
     const count = await this.commentsService.count({
       ticket: ticketId,
@@ -74,13 +80,23 @@ export class CommentsController {
         ...filter,
       },
       {
-        join: {
-          path: 'created_by',
-          select: 'first_name last_name role',
-        },
+        join: [
+          {
+            path: 'created_by',
+            select: 'first_name last_name role',
+          },
+          {
+            path: 'voted_by',
+            match: {
+              created_by: user,
+            },
+            select: {
+              created_by: 0,
+            },
+          },
+        ],
         select: {
           ticket: 0,
-          voted_by: 0,
         },
         paging: {
           limit,
@@ -113,14 +129,33 @@ export class CommentsController {
     if (!canVote) {
       throw new BadRequestException(ERRORS_DICTIONARY.MAX_VOTE_PER_DAY);
     }
-    const comment = await this.commentsService.findOne(id);
+    const comment = await this.commentsService.findOne(id, {
+      join: {
+        path: 'voted_by',
+        match: {
+          created_by: user,
+        },
+        options: {
+          limit: 1,
+        },
+      },
+    });
     if (!comment) {
       throw new NotFoundException(ERRORS_DICTIONARY.COMMENT_NOT_FOUND);
+    }
+    if (comment.voted_by.length && comment.voted_by[0].is_up_vote === dto.upVote) {
+      throw new BadRequestException(ERRORS_DICTIONARY.COMMENT_HAS_VOTED);
+    } else if (comment.voted_by.length) {
+      await this.commentsService.updateVote(comment.voted_by[0].id, dto.upVote);
+      await this.commentsService.update(id, {
+        score: comment.score + (dto.upVote ? 2 : -2),
+      });
+      return;
     }
     await this.commentsService.update(id, {
       score: comment.score + (dto.upVote ? 1 : -1),
     });
-    await this.commentsService.addVotedBy(id, user);
+    await this.commentsService.addVotedBy(id, user, dto.upVote);
   }
 
   @Post(':id/vote-ticket')

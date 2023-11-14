@@ -1,10 +1,9 @@
+import { Comment, CommentDocument, Vote } from '@/modules/comments/entities';
 import { CommentsRepositoryInterface } from '@/modules/comments/interfaces';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BaseRepositoryAbstract } from './base';
-import { Comment, CommentDocument } from '@/modules/comments/entities';
-import { User } from '@/modules/users/entities';
 
 @Injectable()
 export class CommentsRepository
@@ -17,7 +16,7 @@ export class CommentsRepository
     super(commentModel);
   }
 
-  async addVotedBy(id: string, user: User): Promise<Comment> {
+  async addVotedBy(id: string, vote: Vote): Promise<Comment> {
     try {
       return await this.commentModel.findOneAndUpdate(
         {
@@ -25,7 +24,7 @@ export class CommentsRepository
         },
         {
           $push: {
-            voted_by: user,
+            voted_by: vote,
           },
         },
       );

@@ -1,6 +1,7 @@
 import { BaseEntity } from '@/modules/shared/base';
-import { Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { User } from '@/modules/users/entities';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type VoteDocument = HydratedDocument<Vote>;
 
@@ -10,6 +11,19 @@ export type VoteDocument = HydratedDocument<Vote>;
     updatedAt: 'updated_at',
   },
 })
-export class Vote extends BaseEntity {}
+export class Vote extends BaseEntity {
+  @Prop({
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  })
+  created_by: User;
+
+  @Prop({
+    required: true,
+    type: Boolean,
+  })
+  is_up_vote: boolean;
+}
 
 export const VoteSchema = SchemaFactory.createForClass(Vote);

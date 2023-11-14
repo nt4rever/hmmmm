@@ -1,11 +1,12 @@
+import { CommentsRepository } from '@/repositories/comment.repository';
+import { VotesRepository } from '@/repositories/vote.repository';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CommentsController } from './comments.controller';
-import { CommentsService } from './comments.service';
-import { CommentsRepository } from '@/repositories/comment.repository';
-import { Comment, CommentSchema, Vote, VoteSchema } from './entities';
 import { TicketsModule } from '../tickets/tickets.module';
 import { UsersModule } from '../users/users.module';
+import { CommentsController } from './comments.controller';
+import { CommentsService } from './comments.service';
+import { Comment, CommentSchema, Vote, VoteSchema } from './entities';
 
 @Module({
   imports: [
@@ -28,6 +29,10 @@ import { UsersModule } from '../users/users.module';
     {
       provide: 'CommentsRepositoryInterface',
       useClass: CommentsRepository,
+    },
+    {
+      provide: 'VotesRepositoryInterface',
+      useClass: VotesRepository,
     },
   ],
 })
