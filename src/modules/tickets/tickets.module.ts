@@ -1,21 +1,22 @@
+import { EvidencesRepository } from '@/repositories/evidence.repository';
 import { TicketsRepository } from '@/repositories/ticket.repository';
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Evidence, EvidenceSchema, Ticket, TicketSchema } from './entities';
-import { TicketsController } from './tickets.controller';
-import { TicketsService } from './tickets.service';
-import { AwsModule } from '../aws/aws.module';
 import { AreasModule } from '../areas/areas.module';
-import { BullModule } from '@nestjs/bullmq';
+import { AwsModule } from '../aws/aws.module';
+import { TasksModule } from '../tasks/tasks.module';
+import { UsersModule } from '../users/users.module';
+import { VolunteersModule } from '../volunteers/volunteers.module';
+import { Evidence, EvidenceSchema, Ticket, TicketSchema } from './entities';
+import { EvidencesService } from './evidences.service';
 import {
   AssignTaskProcessor,
   SendMailProcessor,
   UploadImageProcessor,
 } from './queues/ticket.processor';
-import { EvidencesRepository } from '@/repositories/evidence.repository';
-import { VolunteersModule } from '../volunteers/volunteers.module';
-import { TasksModule } from '../tasks/tasks.module';
-import { EvidencesService } from './evidences.service';
+import { TicketsController } from './tickets.controller';
+import { TicketsService } from './tickets.service';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { EvidencesService } from './evidences.service';
     AreasModule,
     VolunteersModule,
     TasksModule,
+    UsersModule,
   ],
   controllers: [TicketsController],
   providers: [

@@ -4,6 +4,7 @@ import { TicketsRepositoryInterface } from '@/modules/tickets/interfaces';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
+import { Vote } from '@/modules/comments/entities';
 
 @Injectable()
 export class TicketsRepository
@@ -15,6 +16,23 @@ export class TicketsRepository
     private readonly ticketModel: Model<TicketDocument>,
   ) {
     super(ticketModel);
+  }
+
+  async addVotedBy(id: string, vote: Vote): Promise<Ticket> {
+    try {
+      return await this.ticketModel.findOneAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          $push: {
+            voted_by: vote,
+          },
+        },
+      );
+    } catch (error) {
+      throw error;
+    }
   }
 
   async addEvidence(ticketId: string, evidenceId: string, type: EVIDENCE_TYPE) {

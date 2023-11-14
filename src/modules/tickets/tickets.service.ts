@@ -4,7 +4,9 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Queue } from 'bullmq';
+import { getDistance } from 'geolib';
 import { Area } from '../areas/entities';
+import { Vote } from '../comments/entities';
 import { Ticket } from './entities';
 import {
   AddEvidenceEvent,
@@ -14,7 +16,6 @@ import {
   UploadTicketImageEvent,
 } from './events';
 import { TicketsRepositoryInterface } from './interfaces';
-import { getDistance } from 'geolib';
 
 @Injectable()
 export class TicketsService extends BaseServiceAbstract<Ticket> {
@@ -43,6 +44,14 @@ export class TicketsService extends BaseServiceAbstract<Ticket> {
         throw new NotFoundException(ERRORS_DICTIONARY.TICKET_NOT_FOUND);
       }
       return ticket;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async addVotedBy(id: string, vote: Vote) {
+    try {
+      await this.ticketsRepository.addVotedBy(id, vote);
     } catch (error) {
       throw error;
     }
@@ -112,8 +121,9 @@ export class TicketsService extends BaseServiceAbstract<Ticket> {
             },
           );
         } else {
-          this.logger.debug(distance);
-          this.logger.error('The location of the report is out of area');
+          this.logger.error(
+            `The location of the report is out of area (about ${distance}m)`,
+          );
         }
       }
     } catch (error) {

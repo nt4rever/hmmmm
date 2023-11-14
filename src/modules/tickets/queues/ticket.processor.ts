@@ -58,7 +58,7 @@ export class UploadImageProcessor extends WorkerHost {
 
 @Processor('mail')
 export class SendMailProcessor extends WorkerHost {
-  private logger = new Logger(UploadImageProcessor.name);
+  private logger = new Logger(SendMailProcessor.name);
 
   constructor(private readonly mailService: MailService) {
     super();

@@ -19,6 +19,7 @@ import { TicketsModule } from './modules/tickets/tickets.module';
 import { BullModule } from '@nestjs/bullmq';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { CommentsModule } from './modules/comments/comments.module';
 
 @Module({
   imports: [
@@ -85,6 +86,7 @@ import { TasksModule } from './modules/tasks/tasks.module';
     PaginationModule,
     TicketsModule,
     TasksModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [
