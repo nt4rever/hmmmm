@@ -28,6 +28,8 @@ import { UsersService } from '../users/users.service';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto, FilterCommentDto, VoteCommentDto, VoteTicketDto } from './dto';
 import { CommentPagingSerialization } from './serializations';
+import { VOTE_TYPE } from './entities';
+import { VotesService } from './vote.service';
 
 @Controller('comments')
 @ApiTags('comments')
@@ -39,6 +41,7 @@ export class CommentsController {
     private readonly ticketsService: TicketsService,
     private readonly paginationService: PaginationService,
     private readonly usersService: UsersService,
+    private readonly votesService: VotesService,
   ) {}
 
   @Post()
@@ -89,6 +92,7 @@ export class CommentsController {
             path: 'voted_by',
             match: {
               created_by: user,
+              type: VOTE_TYPE.COMMENT,
             },
             select: {
               created_by: 0,
@@ -134,6 +138,7 @@ export class CommentsController {
         path: 'voted_by',
         match: {
           created_by: user,
+          type: VOTE_TYPE.COMMENT,
         },
         options: {
           limit: 1,
@@ -146,16 +151,25 @@ export class CommentsController {
     if (comment.voted_by.length && comment.voted_by[0].is_up_vote === dto.upVote) {
       throw new BadRequestException(ERRORS_DICTIONARY.COMMENT_HAS_VOTED);
     } else if (comment.voted_by.length) {
-      await this.commentsService.updateVote(comment.voted_by[0].id, dto.upVote);
+      await this.votesService.update(comment.voted_by[0].id, {
+        is_up_vote: dto.upVote,
+      });
       await this.commentsService.update(id, {
         score: comment.score + (dto.upVote ? 2 : -2),
       });
       return;
     }
+    const vote = await this.votesService.create({
+      created_by: user,
+      is_up_vote: dto.upVote,
+      type: VOTE_TYPE.COMMENT,
+    });
+
+    await this.commentsService.addVotedBy(id, vote);
+
     await this.commentsService.update(id, {
       score: comment.score + (dto.upVote ? 1 : -1),
     });
-    await this.commentsService.addVotedBy(id, user, dto.upVote);
   }
 
   @Post(':id/vote-ticket')
@@ -170,10 +184,41 @@ export class CommentsController {
     if (!canVote) {
       throw new BadRequestException(ERRORS_DICTIONARY.MAX_VOTE_PER_DAY);
     }
-    const ticket = await this.ticketsService.findOne(id);
+    const ticket = await this.ticketsService.findOne(id, {
+      join: {
+        path: 'voted_by',
+        match: {
+          created_by: user,
+          type: VOTE_TYPE.TICKET,
+        },
+        options: {
+          limit: 1,
+        },
+      },
+    });
     if (!ticket) {
       throw new NotFoundException(ERRORS_DICTIONARY.TICKET_NOT_FOUND);
     }
+    if (ticket.voted_by?.length && ticket.voted_by[0].is_up_vote === dto.upVote) {
+      throw new BadRequestException(ERRORS_DICTIONARY.TICKET_HAS_VOTED);
+    } else if (ticket.voted_by?.length) {
+      await this.votesService.update(ticket.voted_by[0].id, {
+        is_up_vote: dto.upVote,
+      });
+      await this.ticketsService.update(ticket.id, {
+        score: ticket.score + (dto.upVote ? 2 : -2),
+      });
+      return;
+    }
+
+    const vote = await this.votesService.create({
+      created_by: user,
+      is_up_vote: dto.upVote,
+      type: VOTE_TYPE.TICKET,
+    });
+
+    await this.ticketsService.addVotedBy(id, vote);
+
     await this.ticketsService.update(id, {
       score: ticket.score + (dto.upVote ? 1 : -1),
     });

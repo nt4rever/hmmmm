@@ -1,6 +1,15 @@
+import { PaginationDto } from '@/common/dto';
 import { RequestWithUser } from '@/common/types';
+import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import { PagingSerialization } from '@/decorators/api-paging.decorator';
+import { Public } from '@/decorators/auth.decorator';
+import { DocumentSerialization } from '@/decorators/document.decorator';
+import { Roles } from '@/decorators/roles.decorator';
 import { fileMimetypeFilter } from '@/filters/file-minetype.filter';
+import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
 import { ParseFilePipe } from '@/pipes/parse-file.pipe';
+import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
+import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
 import {
   BadRequestException,
   Body,
@@ -20,9 +29,15 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AreasService } from '../areas/areas.service';
 import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
+import { VOTE_TYPE } from '../comments/entities';
+import { PaginationService } from '../pagination/pagination.service';
+import { TasksService } from '../tasks/tasks.service';
+import { ROLES } from '../users/entities';
+import { UsersService } from '../users/users.service';
+import { VolunteersService } from '../volunteers/volunteers.service';
 import { CreateTicketDoc } from './docs';
 import {
   AssignTicketDto,
@@ -30,29 +45,15 @@ import {
   FilterTicketDto,
   UpdateTicketDto,
 } from './dto';
-import { TicketsService } from './tickets.service';
+import { Ticket } from './entities';
 import {
   AssignTaskEvent,
   SendEmailTicketCreatedEvent,
   UploadTicketImageEvent,
 } from './events';
-import { PaginationDto } from '@/common/dto';
-import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
-import { ParseOrderPipe } from '@/pipes/parse-order.pipe';
-import { PaginationService } from '../pagination/pagination.service';
-import { Ticket } from './entities';
-import { PagingSerialization } from '@/decorators/api-paging.decorator';
 import { TicketPagingSerialization } from './serializations';
-import { Public } from '@/decorators/auth.decorator';
-import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
-import { DocumentSerialization } from '@/decorators/document.decorator';
 import { TicketGetSerialization } from './serializations/ticket.get.serialization';
-import { Roles } from '@/decorators/roles.decorator';
-import { ROLES } from '../users/entities';
-import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
-import { VolunteersService } from '../volunteers/volunteers.service';
-import { TasksService } from '../tasks/tasks.service';
-import { UsersService } from '../users/users.service';
+import { TicketsService } from './tickets.service';
 
 @Controller('tickets')
 @ApiTags('tickets')
@@ -107,10 +108,16 @@ export class TicketsController {
   @ApiOperation({
     summary: 'Public API',
   })
+  @ApiQuery({
+    name: 'user',
+    type: String,
+    required: false,
+  })
   async all(
     @Query(PaginationPagingPipe()) { page, per_page, limit, offset }: PaginationDto,
     @Query('order', ParseOrderPipe) order: Record<string, any>,
     @Query() filter: FilterTicketDto,
+    @Query('user') user?: string,
   ) {
     const count = await this.ticketsService.count(filter);
     const tickets = await this.ticketsService.findAll(filter, {
@@ -121,6 +128,16 @@ export class TicketsController {
         },
         {
           path: 'area',
+        },
+        {
+          path: 'voted_by',
+          match: {
+            created_by: user,
+            type: VOTE_TYPE.TICKET,
+          },
+          select: {
+            created_by: 0,
+          },
         },
       ],
       paging: {
@@ -150,7 +167,12 @@ export class TicketsController {
     summary: 'Public API',
   })
   @DocumentSerialization(TicketGetSerialization)
-  async get(@Param('id', ParseMongoIdPipe) id: string) {
+  @ApiQuery({
+    name: 'user',
+    type: String,
+    required: false,
+  })
+  async get(@Param('id', ParseMongoIdPipe) id: string, @Query('user') user?: string) {
     const ticket = await this.ticketsService.findOne(id, {
       join: [
         {
@@ -165,6 +187,16 @@ export class TicketsController {
           populate: {
             path: 'created_by',
             select: 'first_name last_name',
+          },
+        },
+        {
+          path: 'voted_by',
+          match: {
+            created_by: user,
+            type: VOTE_TYPE.TICKET,
+          },
+          select: {
+            created_by: 0,
           },
         },
       ],

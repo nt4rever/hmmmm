@@ -4,6 +4,7 @@ import { User } from '@/modules/users/entities';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Evidence } from './evidence.entity';
+import { Vote } from '@/modules/comments/entities';
 
 export enum TICKET_STATUS {
   NEW = 'NEW',
@@ -115,6 +116,12 @@ export class Ticket extends BaseEntity {
     trim: true,
   })
   severity_level?: string; // To be determined in future
+
+  @Prop({
+    required: true,
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Vote' }],
+  })
+  voted_by: Vote[];
 }
 
 export const TicketSchema = SchemaFactory.createForClass(Ticket);
