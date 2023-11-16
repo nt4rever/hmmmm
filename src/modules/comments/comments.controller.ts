@@ -86,7 +86,7 @@ export class CommentsController {
         join: [
           {
             path: 'created_by',
-            select: 'first_name last_name role',
+            select: 'first_name last_name role avatar',
           },
           {
             path: 'voted_by',

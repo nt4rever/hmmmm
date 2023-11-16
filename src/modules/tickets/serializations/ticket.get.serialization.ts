@@ -16,6 +16,7 @@ export class CreatedBySerialization extends PickType(UserGetSerialization, [
   'first_name',
   'last_name',
   'role',
+  'avatar',
 ]) {}
 
 export class TicketGetSerialization extends ResponseIdSerialization {
