@@ -10,7 +10,8 @@ import {
   PickType,
 } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
-import { TICKET_STATUS } from '../entities';
+import { Evidence, TICKET_STATUS } from '../entities';
+import { EvidenceGetSerialization } from './evidence.get.serialization';
 
 export class CreatedBySerialization extends PickType(UserGetSerialization, [
   'first_name',
@@ -65,6 +66,9 @@ export class TicketGetSerialization extends ResponseIdSerialization {
   @ApiProperty()
   view_count: number;
 
+  @ApiProperty()
+  comment_count: number;
+
   @ApiPropertyOptional()
   severity_level?: string;
 
@@ -92,4 +96,11 @@ export class TicketGetSerialization extends ResponseIdSerialization {
     { toClassOnly: true },
   )
   voted_by_me: any;
+
+  @Type(() => EvidenceGetSerialization)
+  @ApiProperty({
+    type: EvidenceGetSerialization,
+    isArray: true,
+  })
+  evidences: Evidence[];
 }

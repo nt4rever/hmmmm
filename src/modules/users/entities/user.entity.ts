@@ -9,7 +9,7 @@ import { RefreshToken, RefreshTokenSchema } from './refresh-token.entity';
 import { VotePerDay, VotePerDaySchema } from './vote-per-day.entity';
 import { Area } from '@/modules/areas/entities';
 import { BaseEntity, Location, LocationSchema } from '@/modules/shared/base';
-import { TicketPerDay, TicketPerDaySchema } from './ticker-per-day.entity';
+import { TicketPerDay, TicketPerDaySchema } from './ticket-per-day.entity';
 
 export enum GENDER {
   Male = 'MALE',

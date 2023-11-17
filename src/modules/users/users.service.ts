@@ -8,6 +8,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Area } from '../areas/entities';
 import { AwsService } from '../aws/aws.service';
 import { Location } from '../shared/base';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
@@ -15,6 +16,7 @@ export class UsersService extends BaseServiceAbstract<User> {
     @Inject('UsersRepositoryInterface')
     private readonly usersRepository: UsersRepositoryInterface,
     private readonly awsService: AwsService,
+    private readonly configService: ConfigService,
   ) {
     super(usersRepository);
   }
@@ -74,13 +76,12 @@ export class UsersService extends BaseServiceAbstract<User> {
 
   async canCreateTicket(user: User) {
     try {
-      let count = 10;
+      let count = this.configService.get<number>('limit.ticker_per_day'); // default is 10
 
       if (user.ticket_per_day) {
         const diff = Date.now() - user.ticket_per_day.last_used_at.getTime();
-        if (diff > 1000 * 60 * 60 * 24) {
-          count = 10;
-        } else {
+        if (diff < 1000 * 60 * 60 * 24) {
+          // 1 day
           count = user.ticket_per_day.count;
         }
       }
@@ -101,13 +102,11 @@ export class UsersService extends BaseServiceAbstract<User> {
 
   async canVote(user: User) {
     try {
-      let point = 10;
+      let point = this.configService.get<number>('limit.vote_per_day'); // default is 10
 
       if (user.vote_per_day) {
         const diff = Date.now() - user.vote_per_day.last_used_at.getTime();
-        if (diff > 1000 * 60 * 60 * 24) {
-          point = 10;
-        } else {
+        if (diff < 1000 * 60 * 60 * 24) {
           point = user.vote_per_day.point;
         }
       }

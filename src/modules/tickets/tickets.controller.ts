@@ -123,8 +123,11 @@ export class TicketsController {
     const tickets = await this.ticketsService.findAll(filter, {
       join: [
         {
+          path: 'comment_count',
+        },
+        {
           path: 'created_by',
-          select: 'first_name last_name role  avatar',
+          select: 'first_name last_name role avatar',
         },
         {
           path: 'area',
@@ -176,8 +179,11 @@ export class TicketsController {
     const ticket = await this.ticketsService.findOne(id, {
       join: [
         {
+          path: 'comment_count',
+        },
+        {
           path: 'created_by',
-          select: 'first_name last_name avatar',
+          select: 'first_name last_name role avatar',
         },
         {
           path: 'area',
@@ -186,7 +192,7 @@ export class TicketsController {
           path: 'evidences',
           populate: {
             path: 'created_by',
-            select: 'first_name last_name',
+            select: 'first_name last_name role  avatar',
           },
         },
         {
