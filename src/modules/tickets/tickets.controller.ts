@@ -124,7 +124,7 @@ export class TicketsController {
       join: [
         {
           path: 'created_by',
-          select: 'first_name last_name role  avatar',
+          select: 'first_name last_name role avatar',
         },
         {
           path: 'area',
@@ -177,7 +177,7 @@ export class TicketsController {
       join: [
         {
           path: 'created_by',
-          select: 'first_name last_name avatar',
+          select: 'first_name last_name role avatar',
         },
         {
           path: 'area',
@@ -186,7 +186,7 @@ export class TicketsController {
           path: 'evidences',
           populate: {
             path: 'created_by',
-            select: 'first_name last_name',
+            select: 'first_name last_name role  avatar',
           },
         },
         {
