@@ -66,6 +66,9 @@ export class TicketGetSerialization extends ResponseIdSerialization {
   @ApiProperty()
   view_count: number;
 
+  @ApiProperty()
+  comment_count: number;
+
   @ApiPropertyOptional()
   severity_level?: string;
 

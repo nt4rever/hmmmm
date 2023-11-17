@@ -123,6 +123,9 @@ export class TicketsController {
     const tickets = await this.ticketsService.findAll(filter, {
       join: [
         {
+          path: 'comment_count',
+        },
+        {
           path: 'created_by',
           select: 'first_name last_name role avatar',
         },
@@ -175,6 +178,9 @@ export class TicketsController {
   async get(@Param('id', ParseMongoIdPipe) id: string, @Query('user') user?: string) {
     const ticket = await this.ticketsService.findOne(id, {
       join: [
+        {
+          path: 'comment_count',
+        },
         {
           path: 'created_by',
           select: 'first_name last_name role avatar',

@@ -23,6 +23,8 @@ export type TicketDocument = HydratedDocument<Ticket>;
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   },
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
 })
 export class Ticket extends BaseEntity {
   @Prop({
@@ -125,3 +127,10 @@ export class Ticket extends BaseEntity {
 }
 
 export const TicketSchema = SchemaFactory.createForClass(Ticket);
+
+TicketSchema.virtual('comment_count', {
+  ref: 'Comment',
+  localField: '_id',
+  foreignField: 'ticket',
+  count: true,
+});
