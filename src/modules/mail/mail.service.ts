@@ -30,7 +30,7 @@ export class MailService {
 
   async ticketCreated(email: string, ticketId: string) {
     try {
-      const url = `${process.env.APP_URL}/report/${ticketId}`;
+      const url = `${process.env.APP_URL}/forum/${ticketId}`;
       await this.mailerService.sendMail({
         to: email,
         subject: '[RTS] Your report create successfully',

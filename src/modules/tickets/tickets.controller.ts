@@ -84,7 +84,7 @@ export class TicketsController {
   ) {
     const canCreateTicket = await this.usersService.canCreateTicket(user);
     if (!canCreateTicket) {
-      throw new BadRequestException(ERRORS_DICTIONARY.MAX_TICKER_PER_DAY);
+      throw new BadRequestException(ERRORS_DICTIONARY.MAX_TICKET_PER_DAY);
     }
     const area = await this.areasService.get(dto.area_id);
     const ticket = await this.ticketsService.create({

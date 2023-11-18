@@ -76,7 +76,7 @@ export class UsersService extends BaseServiceAbstract<User> {
 
   async canCreateTicket(user: User) {
     try {
-      let count = this.configService.get<number>('limit.ticker_per_day'); // default is 10
+      let count = this.configService.get<number>('limit.ticket_per_day'); // default is 10
 
       if (user.ticket_per_day) {
         const diff = Date.now() - user.ticket_per_day.last_used_at.getTime();

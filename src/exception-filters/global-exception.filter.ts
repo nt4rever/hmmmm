@@ -13,6 +13,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const statusCode = isHttpException ? exception.getStatus() : 500;
     const message = isHttpException ? exception.message : 'Internal server error';
 
+    console.log(exception);
+
     response.status(statusCode).json({
       statusCode,
       message,
