@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
 import registerConfig from './configs/register';
@@ -20,6 +20,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { CommentsModule } from './modules/comments/comments.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -76,6 +77,12 @@ import { CommentsModule } from './modules/comments/comments.module';
       }),
     }),
     EventEmitterModule.forRoot(),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 1000,
+        limit: 100,
+      },
+    ]),
     AwsModule,
     MailModule,
     UsersModule,
@@ -101,6 +108,10 @@ import { CommentsModule } from './modules/comments/comments.module';
     {
       provide: APP_FILTER,
       useClass: MongoExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

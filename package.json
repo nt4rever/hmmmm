@@ -41,6 +41,7 @@
     "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.1.12",
+    "@nestjs/throttler": "^5.0.1",
     "argon2": "^0.27.2",
     "bullmq": "^4.12.5",
     "class-transformer": "^0.5.1",

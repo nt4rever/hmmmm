@@ -54,6 +54,7 @@ import {
 import { TicketPagingSerialization } from './serializations';
 import { TicketGetSerialization } from './serializations/ticket.get.serialization';
 import { TicketsService } from './tickets.service';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('tickets')
 @ApiTags('tickets')
@@ -162,6 +163,16 @@ export class TicketsController {
       },
       tickets,
     );
+  }
+
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Public()
+  @Get(':id/view')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async view(@Param('id', ParseMongoIdPipe) id: string) {
+    const ticket = await this.ticketsService.findOne(id);
+    if (!ticket) return;
+    await this.ticketsService.update(id, { view_count: ticket.view_count + 1 });
   }
 
   @Get(':id')
