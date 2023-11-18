@@ -253,4 +253,13 @@ export class TicketsController {
       expires_at: dto.expires_at,
     });
   }
+
+  @Public()
+  @Post(':id/view')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async view(@Param('id', ParseMongoIdPipe) id: string) {
+    const ticket = await this.ticketsService.findOne(id);
+    if (!ticket) return;
+    await this.ticketsService.update(id, { view_count: ticket.view_count + 1 });
+  }
 }
