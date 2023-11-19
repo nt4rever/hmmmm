@@ -31,11 +31,12 @@ import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
 import { ManagersService } from '../managers/managers.service';
 import { PaginationService } from '../pagination/pagination.service';
 import { ROLES, User } from '../users/entities';
-import { UserPagingSerialization } from '../users/serializations';
+import { UserGetSerialization, UserPagingSerialization } from '../users/serializations';
 import { UsersService } from '../users/users.service';
 import { CreateVolunteerDoc } from './docs';
 import { CreateVolunteerDto, UpdateVolunteerDto } from './dto';
 import { VolunteersService } from './volunteers.service';
+import { DocumentSerialization } from '@/decorators/document.decorator';
 
 @ApiTags('volunteers')
 @ApiBearerAuth('token')
@@ -111,6 +112,23 @@ export class VolunteersController {
       },
       volunteers,
     );
+  }
+
+  @Get(':id')
+  @DocumentSerialization(UserGetSerialization)
+  @Roles(ROLES.AreaManager)
+  @UseGuards(RolesGuard)
+  async detail(@Param('id', ParseMongoIdPipe) id: string) {
+    const user = await this.usersService.findOneByCondition({
+      _id: id,
+      role: ROLES.Volunteer,
+    });
+
+    if (!user) {
+      throw new NotFoundException(ERRORS_DICTIONARY.USER_NOT_FOUND);
+    }
+
+    return user;
   }
 
   @Patch(':id')

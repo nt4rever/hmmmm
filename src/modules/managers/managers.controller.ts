@@ -32,6 +32,7 @@ import { CreateManagerDoc } from './docs';
 import { CreateManagerDto, UpdateManagerDto } from './dto';
 import { ManagersService } from './managers.service';
 import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import { DocumentSerialization } from '@/decorators/document.decorator';
 
 @Controller('managers')
 @ApiTags('managers')
@@ -62,6 +63,7 @@ export class ManagersController {
   @Get('area/:id')
   @FindAllSerialization({
     classToIntercept: UserGetSerialization,
+    isArray: true,
   })
   @ApiOperation({
     summary: 'Admin get all area manager belong to area',
@@ -91,6 +93,23 @@ export class ManagersController {
         },
       },
     );
+  }
+
+  @Get(':id')
+  @DocumentSerialization(UserGetSerialization)
+  @Roles(ROLES.Admin)
+  @UseGuards(RolesGuard)
+  async detail(@Param('id', ParseMongoIdPipe) id: string) {
+    const manager = await this.userService.findOneByCondition({
+      _id: id,
+      role: ROLES.AreaManager,
+    });
+
+    if (!manager) {
+      throw new NotFoundException(ERRORS_DICTIONARY.USER_NOT_FOUND);
+    }
+
+    return manager;
   }
 
   @Patch(':id')
