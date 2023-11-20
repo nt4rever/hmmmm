@@ -38,6 +38,8 @@ import { FilterTaskDto, UpdateTaskDto } from './dto';
 import { TASK_STATUS } from './entities';
 import { TaskGetSerialization, TaskPagingSerialization } from './serializations';
 import { TasksService } from './tasks.service';
+import { FindAllSerialization } from '@/decorators/api-find-all.decorator';
+import { ORDER_DIRECTION_TYPE } from '@/common/interfaces';
 
 @Controller('tasks')
 @ApiTags('tasks')
@@ -102,6 +104,32 @@ export class TasksController {
       },
       tasks,
     );
+  }
+
+  @Get('ticket/:id')
+  @FindAllSerialization({
+    classToIntercept: TaskGetSerialization,
+    isArray: true,
+  })
+  async getByTicket(@Param('id', ParseMongoIdPipe) id: string) {
+    const tasks = await this.tasksService.findAll(
+      {
+        ticket: id,
+      },
+      {
+        join: {
+          path: 'assignee',
+          select: 'first_name last_name role avatar',
+        },
+        select: {
+          ticket: 0,
+        },
+        order: {
+          created_at: ORDER_DIRECTION_TYPE.ASC,
+        },
+      },
+    );
+    return tasks;
   }
 
   @Get(':id')

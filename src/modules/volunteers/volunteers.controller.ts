@@ -1,7 +1,9 @@
 import { PaginationDto } from '@/common/dto';
 import { RequestWithUser } from '@/common/types';
 import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import { FindAllSerialization } from '@/decorators/api-find-all.decorator';
 import { PagingSerialization } from '@/decorators/api-paging.decorator';
+import { DocumentSerialization } from '@/decorators/document.decorator';
 import { Roles } from '@/decorators/roles.decorator';
 import { PaginationPagingPipe } from '@/pipes/pagination-paging.pipe';
 import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
@@ -25,6 +27,7 @@ import {
   ApiBearerAuth,
   ApiNoContentResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
@@ -35,8 +38,8 @@ import { UserGetSerialization, UserPagingSerialization } from '../users/serializ
 import { UsersService } from '../users/users.service';
 import { CreateVolunteerDoc } from './docs';
 import { CreateVolunteerDto, UpdateVolunteerDto } from './dto';
+import { VolunteerGetSerialization } from './serializations';
 import { VolunteersService } from './volunteers.service';
-import { DocumentSerialization } from '@/decorators/document.decorator';
 
 @ApiTags('volunteers')
 @ApiBearerAuth('token')
@@ -112,6 +115,44 @@ export class VolunteersController {
       },
       volunteers,
     );
+  }
+
+  @Get('list')
+  @ApiQuery({
+    name: 'order',
+    type: 'string',
+    required: false,
+    example: 'id|asc',
+  })
+  @FindAllSerialization({
+    classToIntercept: VolunteerGetSerialization,
+    isArray: true,
+  })
+  @Roles(ROLES.AreaManager)
+  @UseGuards(RolesGuard)
+  async list(
+    @Query('order', ParseOrderPipe) order: Record<string, any>,
+    @Req() { user }: RequestWithUser,
+  ) {
+    const manager = await this.managerService.get(user.id);
+    const volunteers = await this.usersService.findAll(
+      {
+        role: ROLES.Volunteer,
+        area: manager.area,
+        is_active: true,
+      },
+      {
+        order: {
+          ...order,
+        },
+        select: {
+          first_name: 1,
+          last_name: 1,
+          email: 1,
+        },
+      },
+    );
+    return volunteers;
   }
 
   @Get(':id')
