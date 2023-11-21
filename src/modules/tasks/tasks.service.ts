@@ -15,7 +15,7 @@ export class TasksService extends BaseServiceAbstract<Task> {
     super(tasksRepository);
   }
 
-  @Cron(CronExpression.EVERY_6_HOURS, {
+  @Cron(CronExpression.EVERY_2_HOURS, {
     name: 'change-task-status',
     timeZone: 'Asia/Ho_Chi_Minh',
   })

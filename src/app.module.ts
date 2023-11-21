@@ -22,6 +22,7 @@ import { TasksModule } from './modules/tasks/tasks.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MapModule } from './modules/map/map.module';
 
 @Module({
   imports: [
@@ -96,6 +97,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     TicketsModule,
     TasksModule,
     CommentsModule,
+    MapModule,
   ],
   controllers: [],
   providers: [
