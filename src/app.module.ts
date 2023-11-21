@@ -21,6 +21,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MapModule } from './modules/map/map.module';
 
 @Module({
   imports: [
@@ -83,6 +85,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
         limit: 100,
       },
     ]),
+    ScheduleModule.forRoot(),
     AwsModule,
     MailModule,
     UsersModule,
@@ -94,6 +97,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     TicketsModule,
     TasksModule,
     CommentsModule,
+    MapModule,
   ],
   controllers: [],
   providers: [
