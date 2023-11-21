@@ -55,6 +55,8 @@ import { TicketPagingSerialization } from './serializations';
 import { TicketGetSerialization } from './serializations/ticket.get.serialization';
 import { TicketsService } from './tickets.service';
 import { Throttle } from '@nestjs/throttler';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Controller('tickets')
 @ApiTags('tickets')
@@ -69,6 +71,8 @@ export class TicketsController {
     private readonly volunteersService: VolunteersService,
     private readonly tasksService: TasksService,
     private readonly usersService: UsersService,
+    @InjectQueue('mail')
+    private readonly mailQueue: Queue,
   ) {}
 
   @Post()
@@ -257,11 +261,20 @@ export class TicketsController {
   ) {
     const ticket = await this.ticketsService.getByArea(id, user.area);
     const assignee = await this.volunteersService.get(dto.assignee, user.area);
-    await this.tasksService.create({
+    const task = await this.tasksService.create({
       ticket,
       assignee,
       note: dto.note,
       expires_at: dto.expires_at,
     });
+    this.mailQueue.add(
+      'ticket-assigned',
+      {
+        ticketId: ticket.id,
+        email: assignee.email,
+        taskId: task.id,
+      },
+      { removeOnComplete: true },
+    );
   }
 }
