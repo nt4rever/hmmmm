@@ -4,14 +4,16 @@ import { CreateUserDto } from './dto';
 import { RefreshToken, User } from './entities';
 import { UsersRepositoryInterface } from './interfaces';
 import { BaseServiceAbstract } from '@/services/base';
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Area } from '../areas/entities';
 import { AwsService } from '../aws/aws.service';
 import { Location } from '../shared/base';
 import { ConfigService } from '@nestjs/config';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
+  private readonly logger = new Logger(UsersService.name);
   constructor(
     @Inject('UsersRepositoryInterface')
     private readonly usersRepository: UsersRepositoryInterface,
@@ -123,5 +125,17 @@ export class UsersService extends BaseServiceAbstract<User> {
     } catch (error) {
       throw error;
     }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_1AM, {
+    name: 'remove-token-expires',
+    timeZone: 'Asia/Ho_Chi_Minh',
+  })
+  async handleRemoveTokenExpires() {
+    try {
+      this.logger.warn('Schedule remove token expires is running...');
+      this.usersRepository.removeTokenExpires();
+      this.logger.warn('Schedule remove token expires DONE');
+    } catch (error) {}
   }
 }

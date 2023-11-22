@@ -12,15 +12,21 @@ export class MailService {
     this.logger = new Logger(MailService.name);
   }
 
-  async resetPassword(email: string) {
+  async resetPassword(payload: {
+    email: string;
+    name: string;
+    token: string;
+    userId: string;
+  }) {
     try {
+      const url = `${process.env.APP_URL}/reset-password?userId=${payload.userId}&token=${payload.token}`;
       await this.mailerService.sendMail({
-        to: email,
-        subject: 'Welcome to Nice App! Confirm your Email',
+        to: payload.email,
+        subject: '[RTS] Reset your password',
         template: './reset-password.hbs',
         context: {
-          name: 'Tan',
-          url: 'localhost',
+          name: payload.name,
+          url,
         },
       });
     } catch (error) {

@@ -12,7 +12,7 @@ export class RefreshToken {
   device_name?: string;
 
   @Prop({
-    default: Date.now(),
+    default: Date.now,
     type: Date,
   })
   created_at?: Date;
