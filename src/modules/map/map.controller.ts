@@ -6,8 +6,10 @@ import { TicketMinimumGetSerialization } from '../tickets/serializations';
 import { TicketsService } from '../tickets/tickets.service';
 import { GetMapDto } from './dto';
 import { MapService } from './map.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('map')
+@ApiTags('map')
 export class MapController {
   constructor(
     private readonly mapService: MapService,
