@@ -77,4 +77,30 @@ export class UsersRepository
       throw error;
     }
   }
+
+  async removeTokenExpires() {
+    try {
+      const userIds = await this.userModel.find().select('_id');
+
+      const tokenExpirationTime =
+        (Number(process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME) || 7 * 24 * 60 * 60) *
+        1000;
+      const thresholdDate = new Date();
+      thresholdDate.setTime(thresholdDate.getTime() - tokenExpirationTime);
+
+      for (const userId of userIds) {
+        await this.userModel.updateOne(
+          {
+            _id: userId._id,
+          },
+          {
+            $pull: { refresh_token: { created_at: { $lt: thresholdDate } } },
+          },
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 }
