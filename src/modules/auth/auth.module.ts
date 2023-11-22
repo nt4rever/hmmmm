@@ -9,15 +9,26 @@ import {
   JwtRefreshTokenStrategy,
   LocalStrategy,
 } from './strategies';
+import { BullModule } from '@nestjs/bullmq';
+import { SendMailProcessor } from './queues/auth.processor';
 
 @Module({
-  imports: [UsersModule, PassportModule, JwtModule.register({})],
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.register({}),
+    BullModule.registerQueue({
+      name: 'mail-auth',
+      prefix: 'auth',
+    }),
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,
     LocalStrategy,
     JwtAccessTokenStrategy,
     JwtRefreshTokenStrategy,
+    SendMailProcessor,
   ],
 })
 export class AuthModule {}

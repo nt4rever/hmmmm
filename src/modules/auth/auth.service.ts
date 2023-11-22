@@ -1,6 +1,7 @@
 import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import {
   ConflictException,
+  Inject,
   Injectable,
   Logger,
   UnauthorizedException,
@@ -8,11 +9,15 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
-import { randomUUID } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import { User } from '../users/entities';
 import { UsersService } from '../users/users.service';
 import { SignUpDto } from './dto';
 import { TokenPayload } from './interfaces';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +27,9 @@ export class AuthService {
     private configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectQueue('mail-auth')
+    private readonly mailQueue: Queue,
   ) {
     this.logger = new Logger(AuthService.name);
   }
@@ -168,5 +176,30 @@ export class AuthService {
     if (!isMatching) {
       throw new UnauthorizedException();
     }
+  }
+
+  async forgotPassword(email: string) {
+    try {
+      const user = await this.usersService.findOneByCondition({ email });
+
+      if (!user) return;
+      const token = this.sha256(`${randomUUID()}-${Date.now()}-${user.id}`);
+      await this.cacheManager.set(user.id, token, 1000 * 60 * 30); // 30 minutes
+
+      this.mailQueue.add(
+        'forgot-password',
+        {
+          user,
+          token,
+        },
+        { removeOnComplete: true },
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  sha256(content: string) {
+    return createHash('sha256').update(content).digest('hex');
   }
 }

@@ -24,6 +24,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MapModule } from './modules/map/map.module';
 import { PostsModule } from './modules/posts/posts.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -87,6 +88,9 @@ import { PostsModule } from './modules/posts/posts.module';
       },
     ]),
     ScheduleModule.forRoot(),
+    CacheModule.register({
+      isGlobal: true,
+    }),
     AwsModule,
     MailModule,
     UsersModule,

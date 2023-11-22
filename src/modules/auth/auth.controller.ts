@@ -19,9 +19,10 @@ import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { LogoutDoc, RefreshAccessTokenDoc, SignInDoc, SignUpDoc } from './docs';
-import { ChangePasswordDto, SignUpDto } from './dto';
+import { ChangePasswordDto, ForgotPasswordDto, SignUpDto } from './dto';
 import { JwtAccessTokenGuard, JwtRefreshTokenGuard, LocalAuthGuard } from './guards';
 import { ROLES } from '../users/entities';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -100,5 +101,12 @@ export class AuthController {
     } catch (error) {
       throw new BadRequestException(ERRORS_DICTIONARY.CHANGE_PASSWORD_FAIL);
     }
+  }
+
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.authService.forgotPassword(dto.email);
   }
 }
