@@ -14,7 +14,12 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiNoContentResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
@@ -23,6 +28,7 @@ import { ChangePasswordDto, ForgotPasswordDto, SignUpDto } from './dto';
 import { JwtAccessTokenGuard, JwtRefreshTokenGuard, LocalAuthGuard } from './guards';
 import { ROLES } from '../users/entities';
 import { Throttle } from '@nestjs/throttler';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -84,6 +90,9 @@ export class AuthController {
   }
 
   @Post('change-password')
+  @ApiOperation({
+    summary: 'User has logged in change password',
+  })
   @ApiBearerAuth('token')
   @ApiNoContentResponse()
   @UseGuards(JwtAccessTokenGuard)
@@ -103,10 +112,23 @@ export class AuthController {
     }
   }
 
-  @Throttle({ default: { limit: 100, ttl: 60000 } })
+  @Throttle({ default: { limit: 1, ttl: 60000 } })
   @Post('forgot-password')
+  @ApiOperation({
+    summary: 'User send request forgot password',
+  })
   @HttpCode(HttpStatus.NO_CONTENT)
   async forgotPassword(@Body() dto: ForgotPasswordDto) {
     await this.authService.forgotPassword(dto.email);
+  }
+
+  @Throttle({ default: { limit: 15, ttl: 60000 } })
+  @Post('reset-password')
+  @ApiOperation({
+    summary: 'User reset password with token',
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.authService.resetPassword(dto);
   }
 }
