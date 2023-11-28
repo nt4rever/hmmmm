@@ -32,7 +32,12 @@ services:
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
     restart: unless-stopped
-
+  hmmmm_ai:
+    image: nt4rever/rts:latest
+    container_name: hmmmm_ai
+    ports:
+      - 8888:8888
+    restart: unless-stopped
 networks:
   default:
     driver: bridge
