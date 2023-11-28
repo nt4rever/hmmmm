@@ -11,7 +11,7 @@ export class TicketPerDay {
   @Prop({ default: parseInt(process.env.TICKET_PER_DAY, 10) || 10 })
   count: number;
 
-  @Prop({ default: Date.now(), type: Date })
+  @Prop({ default: Date.now, type: Date })
   last_used_at: Date;
 }
 

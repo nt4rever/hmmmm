@@ -1,18 +1,27 @@
 import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
+import { sha256 } from '@/utils/crypto';
+import { InjectQueue } from '@nestjs/bullmq';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
+  BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
+import { Queue } from 'bullmq';
+import { Cache } from 'cache-manager';
 import { randomUUID } from 'crypto';
 import { User } from '../users/entities';
 import { UsersService } from '../users/users.service';
 import { SignUpDto } from './dto';
 import { TokenPayload } from './interfaces';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +31,9 @@ export class AuthService {
     private configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectQueue('mail-auth')
+    private readonly mailQueue: Queue,
   ) {
     this.logger = new Logger(AuthService.name);
   }
@@ -167,6 +179,50 @@ export class AuthService {
     const isMatching = await argon2.verify(hashedText, plainText);
     if (!isMatching) {
       throw new UnauthorizedException();
+    }
+  }
+
+  async forgotPassword(email: string) {
+    try {
+      const user = await this.usersService.findOneByCondition({ email });
+
+      if (!user) return;
+      const token = sha256(`${randomUUID()}-${Date.now()}-${user.id}`);
+      await this.cacheManager.set(user.id, token, 1000 * 60 * 30); // 30 minutes
+
+      this.mailQueue.add(
+        'forgot-password',
+        {
+          user,
+          token,
+        },
+        { removeOnComplete: true },
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    try {
+      const user = await this.usersService.findOne(dto.user_id);
+      if (!user) {
+        throw new NotFoundException(ERRORS_DICTIONARY.USER_NOT_FOUND);
+      }
+
+      const key = await this.cacheManager.get<string>(dto.user_id);
+      if (!key || key !== dto.token) {
+        throw new BadRequestException(ERRORS_DICTIONARY.UPDATE_FAIL);
+      }
+
+      const hashedPassword = await argon2.hash(dto.password);
+      await this.usersService.update(user.id, {
+        password: hashedPassword,
+        refresh_token: [], // Remove all refresh token in DB (logout all device)
+      });
+      await this.cacheManager.del(dto.user_id);
+    } catch (error) {
+      throw error;
     }
   }
 }

@@ -24,6 +24,8 @@ export interface BaseRepositoryInterface<T> {
 
   update(_id: string, dto: Partial<T>): Promise<T>;
 
+  updateMany(find: Record<string, any>, dto: Partial<T>): Promise<void>;
+
   softDelete(_id: string): Promise<boolean>;
 
   permanentlyDelete(_id: string): Promise<boolean>;

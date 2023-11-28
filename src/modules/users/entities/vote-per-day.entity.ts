@@ -11,7 +11,7 @@ export class VotePerDay {
   @Prop({ default: parseInt(process.env.VOTE_PER_DAY, 10) || 10 })
   point: number;
 
-  @Prop({ default: Date.now(), type: Date })
+  @Prop({ default: Date.now, type: Date })
   last_used_at: Date;
 }
 

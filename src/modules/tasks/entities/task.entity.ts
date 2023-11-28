@@ -48,7 +48,7 @@ export class Task extends BaseEntity {
 
   @Prop({
     type: Date,
-    default: Date.now() + 3600 * 1000 * 24, // 24 hours
+    default: () => Date.now() + 3600 * 1000 * 24, // 24 hours
   })
   expires_at: Date;
 }

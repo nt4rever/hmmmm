@@ -1,9 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Allow } from 'class-validator';
+import { Allow, IsMongoId, IsOptional } from 'class-validator';
 
 export class FilterTicketDto {
   @ApiPropertyOptional()
   @Allow()
+  @IsOptional()
+  @IsMongoId()
   area?: string;
 
   @ApiPropertyOptional()
@@ -12,5 +14,7 @@ export class FilterTicketDto {
 
   @ApiPropertyOptional()
   @Allow()
+  @IsOptional()
+  @IsMongoId()
   created_by?: string;
 }

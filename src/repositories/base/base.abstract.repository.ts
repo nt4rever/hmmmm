@@ -197,4 +197,8 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
     }
     return !!(await this.model.findByIdAndDelete(_id));
   }
+
+  async updateMany(find: Record<string, any>, dto: Partial<T>) {
+    await this.model.updateMany({ ...find, deleted_at: null }, dto, { new: true });
+  }
 }
