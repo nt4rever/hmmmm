@@ -33,6 +33,7 @@ services:
       - ${REDIS_PORT}:${REDIS_PORT}
     restart: unless-stopped
   hmmmm_ai:
+    env_file: .env
     image: nt4rever/rts:latest
     container_name: hmmmm_ai
     ports:
