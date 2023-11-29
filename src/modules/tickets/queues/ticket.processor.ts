@@ -10,6 +10,8 @@ import { VolunteersService } from '@/modules/volunteers/volunteers.service';
 import { TasksService } from '@/modules/tasks/tasks.service';
 import { TASK_STATUS } from '@/modules/tasks/entities';
 import { ConfigService } from '@nestjs/config';
+import { AiService } from '../ai.service';
+import { AiServiceError } from '@/common/interfaces';
 
 @Processor('image:upload')
 export class UploadImageProcessor extends WorkerHost {
@@ -19,6 +21,7 @@ export class UploadImageProcessor extends WorkerHost {
     private readonly ticketsService: TicketsService,
     private readonly evidencesService: EvidencesService,
     private readonly awsService: AwsService,
+    private readonly aiService: AiService,
   ) {
     super();
   }
@@ -35,8 +38,17 @@ export class UploadImageProcessor extends WorkerHost {
             images: imageUrls,
           });
           this.logger.log('[JOB_SUCCESS] Upload ticket images to AWS success');
+          const data = await this.aiService.predicts(job.data.images);
+          await this.ticketsService.update(job.data.ticketId, {
+            severity_level: data,
+          });
+          this.logger.log('[JOB_SUCCESS] Get data from AI service');
           return true;
         } catch (error) {
+          if (error instanceof AiServiceError) {
+            this.logger.debug(error.message);
+            return true;
+          }
           throw error;
         }
 
