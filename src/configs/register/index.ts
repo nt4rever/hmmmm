@@ -5,6 +5,7 @@ import LimitConfig from './limit.config';
 import MailConfig from './mail.config';
 import RedisConfig from './redis.config';
 import TicketConfig from './ticket.config';
+import AiConfig from './ai.config';
 
 export default [
   AwsConfig,
@@ -14,4 +15,5 @@ export default [
   RedisConfig,
   TicketConfig,
   LimitConfig,
+  AiConfig,
 ];

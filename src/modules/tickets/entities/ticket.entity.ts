@@ -114,10 +114,10 @@ export class Ticket extends BaseEntity {
   view_count: number;
 
   @Prop({
-    type: String,
+    type: Object,
     trim: true,
   })
-  severity_level?: string; // To be determined in future
+  severity_level?: any; // To be determined in future
 
   @Prop({
     required: true,

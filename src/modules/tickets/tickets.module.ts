@@ -17,6 +17,8 @@ import {
 } from './queues/ticket.processor';
 import { TicketsController } from './tickets.controller';
 import { TicketsService } from './tickets.service';
+import { HttpModule } from '@nestjs/axios';
+import { AiService } from './ai.service';
 
 @Module({
   imports: [
@@ -44,6 +46,9 @@ import { TicketsService } from './tickets.service';
         prefix: 'ticket',
       },
     ),
+    HttpModule.register({
+      timeout: 50000,
+    }),
     AwsModule,
     AreasModule,
     VolunteersModule,
@@ -54,6 +59,7 @@ import { TicketsService } from './tickets.service';
   providers: [
     TicketsService,
     EvidencesService,
+    AiService,
     {
       provide: 'TicketsRepositoryInterface',
       useClass: TicketsRepository,
