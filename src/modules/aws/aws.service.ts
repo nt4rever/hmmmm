@@ -61,7 +61,10 @@ export class AwsService {
         const key = `${folderName}/${randomUUID()}.${file.originalname
           .split('.')
           .at(-1)}`;
-        const imageResized = await resizedImage(file.buffer, { width: 500, height: 500 });
+        const imageResized = await resizedImage(Buffer.from(file.buffer), {
+          width: 500,
+          height: 500,
+        });
         return this.uploadPublicFile(imageResized, key);
       });
 
