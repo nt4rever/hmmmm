@@ -30,4 +30,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: nt4rever/hmmmm:$(date +%s)
+          tags: nt4rever/hmmmm:${{ GITHUB_SHA::6 }}
