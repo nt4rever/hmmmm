@@ -29,6 +29,7 @@ export class SendMailProcessor extends WorkerHost {
           );
           return true;
         } catch (error) {
+          console.log(error);
           throw error;
         }
 

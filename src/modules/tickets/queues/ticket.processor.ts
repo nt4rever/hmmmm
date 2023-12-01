@@ -49,6 +49,7 @@ export class UploadImageProcessor extends WorkerHost {
             this.logger.debug(error.message);
             return true;
           }
+          console.log(error);
           throw error;
         }
 
@@ -84,6 +85,7 @@ export class SendMailProcessor extends WorkerHost {
           this.logger.log('[JOB_SUCCESS] Send email create ticket successfully to user');
           return true;
         } catch (error) {
+          console.log(error);
           throw error;
         }
       case 'ticket-assigned':
@@ -96,6 +98,7 @@ export class SendMailProcessor extends WorkerHost {
           this.logger.log('[JOB_SUCCESS] Send email assign ticket successfully to user');
           return true;
         } catch (error) {
+          console.log(error);
           throw error;
         }
 
@@ -190,6 +193,7 @@ export class AssignTaskProcessor extends WorkerHost {
 
           return true;
         } catch (error) {
+          console.log(error);
           throw error;
         }
 
