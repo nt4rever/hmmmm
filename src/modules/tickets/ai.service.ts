@@ -3,7 +3,6 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
-import * as FormData from 'form-data';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AiPredictResponse } from './interfaces';
 
@@ -16,26 +15,26 @@ export class AiService {
     private readonly httpService: HttpService,
   ) {}
 
-  async predicts(images: Array<Express.Multer.File>) {
+  async predicts(images: Array<string>) {
     try {
       const endpoint = this.configService.get<string>('ai.endpoint');
       const key = this.configService.get('ai.key');
       if (!endpoint || !key) {
         throw new AiServiceError('AI endpoint and key is not config!');
       }
-
-      const formData = new FormData();
-      images.forEach((image) => {
-        formData.append(`files`, Buffer.from(image.buffer), image.originalname);
-      });
       const { data } = await firstValueFrom(
         this.httpService
-          .post<AiPredictResponse>(`${endpoint}/predicts`, formData, {
-            headers: {
-              'X-API-Key': key,
-              ...formData.getHeaders(),
+          .post<AiPredictResponse>(
+            `${endpoint}/predicts`,
+            {
+              images,
             },
-          })
+            {
+              headers: {
+                'X-API-Key': key,
+              },
+            },
+          )
           .pipe(
             catchError((error: AxiosError) => {
               this.logger.error(error);

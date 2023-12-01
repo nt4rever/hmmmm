@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { S3, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { randomUUID } from 'crypto';
+import { resizedImage } from '@/utils/resizeImage';
 
 @Injectable()
 export class AwsService {
@@ -56,11 +57,12 @@ export class AwsService {
 
   async uploadMultipleFile(folderName: string, files: Express.Multer.File[]) {
     try {
-      const listUpload = files.map((file) => {
+      const listUpload = files.map(async (file) => {
         const key = `${folderName}/${randomUUID()}.${file.originalname
           .split('.')
           .at(-1)}`;
-        return this.uploadPublicFile(Buffer.from(file.buffer), key);
+        const imageResized = await resizedImage(file.buffer, { width: 500, height: 500 });
+        return this.uploadPublicFile(imageResized, key);
       });
 
       return await Promise.all(listUpload);
