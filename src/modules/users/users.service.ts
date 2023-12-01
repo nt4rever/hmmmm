@@ -10,6 +10,7 @@ import { AwsService } from '../aws/aws.service';
 import { Location } from '../shared/base';
 import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { resizedImage } from '@/utils/resizeImage';
 
 @Injectable()
 export class UsersService extends BaseServiceAbstract<User> {
@@ -52,8 +53,8 @@ export class UsersService extends BaseServiceAbstract<User> {
       const key = `avatars/${user.id}/${randomUUID()}.${file.originalname
         .split('.')
         .at(-1)}`;
-
-      await this.awsService.uploadPublicFile(file.buffer, key);
+      const imageResized = await resizedImage(file.buffer, { width: 100, height: 100 });
+      await this.awsService.uploadPublicFile(imageResized, key);
 
       if (user.avatar) {
         this.awsService.deleteFile(user.avatar);

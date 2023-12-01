@@ -38,7 +38,7 @@ export class UploadImageProcessor extends WorkerHost {
             images: imageUrls,
           });
           this.logger.log('[JOB_SUCCESS] Upload ticket images to AWS success');
-          const data = await this.aiService.predicts(job.data.images);
+          const data = await this.aiService.predicts(imageUrls);
           await this.ticketsService.update(job.data.ticketId, {
             severity_level: data,
           });
