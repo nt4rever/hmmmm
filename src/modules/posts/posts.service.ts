@@ -44,4 +44,12 @@ export class PostsService extends BaseServiceAbstract<Post> {
       throw error;
     }
   }
+
+  async removeCategory(id: string) {
+    try {
+      await this.postCategoriesRepository.softDelete(id);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
