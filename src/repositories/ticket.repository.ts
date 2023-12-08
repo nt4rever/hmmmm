@@ -35,6 +35,26 @@ export class TicketsRepository
     }
   }
 
+  async removeVotedBy(id: string, vote: Vote) {
+    try {
+      return await this.ticketModel.findOneAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          $pull: {
+            voted_by: vote,
+          },
+          $inc: {
+            score: -1,
+          },
+        },
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async addEvidence(ticketId: string, evidenceId: string, type: EVIDENCE_TYPE) {
     try {
       const data =

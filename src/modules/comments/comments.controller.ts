@@ -24,11 +24,19 @@ import { ApiBearerAuth, ApiNoContentResponse, ApiQuery, ApiTags } from '@nestjs/
 import { JwtAccessTokenGuard } from '../auth/guards';
 import { PaginationService } from '../pagination/pagination.service';
 import { TicketsService } from '../tickets/tickets.service';
+import { User } from '../users/entities';
 import { UsersService } from '../users/users.service';
 import { CommentsService } from './comments.service';
-import { CreateCommentDto, FilterCommentDto, VoteCommentDto, VoteTicketDto } from './dto';
-import { CommentPagingSerialization } from './serializations';
+import {
+  CreateCommentDto,
+  FilterCommentDto,
+  UnVoteDto,
+  VoteCommentDto,
+  VoteTicketDto,
+} from './dto';
 import { VOTE_TYPE } from './entities';
+import { CommentPagingSerialization } from './serializations';
+import { UnVoteCommentGateway, UnVoteGateway, UnVoteTicketGateway } from './vote.gateway';
 import { VotesService } from './vote.service';
 
 @Controller('comments')
@@ -222,5 +230,30 @@ export class CommentsController {
     await this.ticketsService.update(id, {
       score: ticket.score + (dto.upVote ? 1 : -1),
     });
+  }
+
+  @Post(':id/un-vote')
+  @ApiNoContentResponse()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async unVote(
+    @Body() dto: UnVoteDto,
+    @Param('id', ParseMongoIdPipe) id: string,
+    @Req() { user }: RequestWithUser,
+  ) {
+    await this.processUnVote(id, user, dto.type);
+  }
+
+  private unVoteGateway: Record<string, UnVoteGateway> = {
+    [VOTE_TYPE.TICKET]: new UnVoteTicketGateway(this.ticketsService),
+    [VOTE_TYPE.COMMENT]: new UnVoteCommentGateway(this.commentsService),
+  };
+
+  private async processUnVote(id: string, user: User, type: VOTE_TYPE) {
+    const gateway = this.unVoteGateway[type];
+    if (gateway) {
+      await gateway.processUnVote(id, user);
+    } else {
+      throw new Error('Unsupported un vote method!');
+    }
   }
 }

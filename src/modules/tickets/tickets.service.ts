@@ -57,6 +57,14 @@ export class TicketsService extends BaseServiceAbstract<Ticket> {
     }
   }
 
+  async removeVotedBy(id: string, vote: Vote) {
+    try {
+      await this.ticketsRepository.removeVotedBy(id, vote);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @OnEvent('ticket.upload-image')
   handleUploadTicketImages(payload: UploadTicketImageEvent) {
     this.imageUploadQueue.add('upload-image', payload, {
