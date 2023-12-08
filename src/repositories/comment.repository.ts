@@ -44,7 +44,7 @@ export class CommentsRepository
             voted_by: vote,
           },
           $inc: {
-            score: -1,
+            score: vote.is_up_vote ? -1 : 1,
           },
         },
       );
