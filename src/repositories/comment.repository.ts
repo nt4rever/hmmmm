@@ -32,4 +32,24 @@ export class CommentsRepository
       throw error;
     }
   }
+
+  async removeVotedBy(id: string, vote: Vote) {
+    try {
+      return await this.commentModel.findOneAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          $pull: {
+            voted_by: vote,
+          },
+          $inc: {
+            score: -1,
+          },
+        },
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -64,6 +65,11 @@ export class PostsController {
     return await this.postsService.allCategory();
   }
 
+  @Delete('category/:id')
+  async deleteCategory(@Param('id', ParseMongoIdPipe) id: string) {
+    await this.postsService.removeCategory(id);
+  }
+
   @PostMethod()
   @ApiOperation({
     summary: 'Admin create new post',
@@ -118,6 +124,11 @@ export class PostsController {
       throw new NotFoundException(ERRORS_DICTIONARY.POST_NOT_FOUND);
     }
     return post;
+  }
+
+  @Delete(':id')
+  async deletePost(@Param('id', ParseMongoIdPipe) id: string) {
+    await this.postsService.remove(id);
   }
 
   @Throttle({ default: { limit: 10, ttl: 60000 } })

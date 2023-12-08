@@ -46,6 +46,11 @@ export abstract class BaseServiceAbstract<T extends BaseEntity>
     return await this.repository.update(_id, updateDto);
   }
 
+  /**
+   * Soft delete
+   * @param _id string
+   * @return Promise<boolean>
+   */
   async remove(_id: string) {
     return await this.repository.softDelete(_id);
   }

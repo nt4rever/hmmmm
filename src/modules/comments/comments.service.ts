@@ -21,4 +21,12 @@ export class CommentsService extends BaseServiceAbstract<Comment> {
       throw error;
     }
   }
+
+  async removeVotedBy(id: string, vote: Vote) {
+    try {
+      await this.commentsRepository.removeVotedBy(id, vote);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
