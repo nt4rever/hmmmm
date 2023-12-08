@@ -1,9 +1,9 @@
-import { ApiPropertyOptional, PartialType, PickType } from '@nestjs/swagger';
-import { CreateVolunteerDto } from './create-volunteer.dto';
+import { ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger';
 import { IsBoolean, IsNumber, IsOptional, Max, Min } from 'class-validator';
+import { CreateVolunteerDto } from './create-volunteer.dto';
 
 export class UpdateVolunteerDto extends PartialType(
-  PickType(CreateVolunteerDto, ['lat', 'lng']),
+  OmitType(CreateVolunteerDto, ['radius', 'email', 'password']),
 ) {
   @ApiPropertyOptional()
   @IsOptional()

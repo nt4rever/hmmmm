@@ -32,6 +32,7 @@ export class VolunteersService {
   async update(user: User, dto: UpdateVolunteerDto) {
     try {
       await this.usersService.update(user.id, {
+        ...dto,
         is_active: dto.is_active ?? user.is_active,
         location: {
           lat: dto.lat ?? user.location?.lat,
