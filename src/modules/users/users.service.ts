@@ -82,9 +82,12 @@ export class UsersService extends BaseServiceAbstract<User> {
       let count = this.configService.get<number>('limit.ticket_per_day'); // default is 10
 
       if (user.ticket_per_day) {
-        const diff = Date.now() - user.ticket_per_day.last_used_at.getTime();
-        if (diff < 1000 * 60 * 60 * 24) {
-          // 1 day
+        const currentDate = new Date();
+        // Check is last used at is not today
+        if (
+          currentDate.setHours(0, 0, 0, 0) !=
+          user.ticket_per_day.last_used_at.setHours(0, 0, 0, 0)
+        ) {
           count = user.ticket_per_day.count;
         }
       }
@@ -108,8 +111,12 @@ export class UsersService extends BaseServiceAbstract<User> {
       let point = this.configService.get<number>('limit.vote_per_day'); // default is 10
 
       if (user.vote_per_day) {
-        const diff = Date.now() - user.vote_per_day.last_used_at.getTime();
-        if (diff < 1000 * 60 * 60 * 24) {
+        const currentDate = new Date();
+        // Check is last used at is not today
+        if (
+          currentDate.setHours(0, 0, 0, 0) !=
+          user.vote_per_day.last_used_at.setHours(0, 0, 0, 0)
+        ) {
           point = user.vote_per_day.point;
         }
       }
