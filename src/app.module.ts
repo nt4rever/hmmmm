@@ -25,6 +25,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MapModule } from './modules/map/map.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ExportsModule } from './modules/exports/exports.module';
 
 @Module({
   imports: [
@@ -104,6 +105,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     CommentsModule,
     MapModule,
     PostsModule,
+    ExportsModule,
   ],
   controllers: [],
   providers: [
