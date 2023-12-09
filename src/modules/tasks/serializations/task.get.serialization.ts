@@ -1,9 +1,13 @@
 import { ResponseIdSerialization } from '@/common/serializations';
-import { TASK_STATUS } from '../entities';
+import { Ticket } from '@/modules/tickets/entities';
+import {
+  CreatedBySerialization,
+  TicketGetSerialization,
+} from '@/modules/tickets/serializations/ticket.get.serialization';
+import { User } from '@/modules/users/entities';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Ticket } from '@/modules/tickets/entities';
-import { TicketGetSerialization } from '@/modules/tickets/serializations/ticket.get.serialization';
+import { TASK_STATUS } from '../entities';
 
 export class TaskGetSerialization extends ResponseIdSerialization {
   @Type(() => TicketGetSerialization)
@@ -23,4 +27,10 @@ export class TaskGetSerialization extends ResponseIdSerialization {
 
   @ApiProperty()
   expires_at: Date;
+
+  @Type(() => CreatedBySerialization)
+  @ApiPropertyOptional({
+    type: CreatedBySerialization,
+  })
+  assignee?: User;
 }
