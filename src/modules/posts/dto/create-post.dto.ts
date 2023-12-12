@@ -35,13 +35,13 @@ export class CreatePostDto {
 
   @IsOptional()
   @MaxLength(200)
-  keyword_SEO: string;
+  keyword_SEO?: string;
 
   @IsOptional()
   @MaxLength(500)
-  description_SEO: string;
+  description_SEO?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsMongoId()
-  category: string;
+  category?: string;
 }

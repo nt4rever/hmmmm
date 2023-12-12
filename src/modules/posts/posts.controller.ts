@@ -7,6 +7,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post as PostMethod,
   Query,
   UseGuards,
@@ -16,7 +17,12 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard, RolesGuard } from '../auth/guards';
 import { Roles } from '@/decorators/roles.decorator';
 import { ROLES } from '../users/entities';
-import { CreatePostCategoryDto, CreatePostDto, FilterPostDto } from './dto';
+import {
+  CreatePostCategoryDto,
+  CreatePostDto,
+  FilterPostDto,
+  UpdatePostDto,
+} from './dto';
 import { FindAllSerialization } from '@/decorators/api-find-all.decorator';
 import {
   PostCategoryGetSerialization,
@@ -33,6 +39,7 @@ import { ParseMongoIdPipe } from '@/pipes/parse-mongo-id.pipe';
 import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 import { DocumentSerialization } from '@/decorators/document.decorator';
 import { Throttle } from '@nestjs/throttler';
+import { isObjectIdOrHexString } from 'mongoose';
 
 @Controller('posts')
 @ApiTags('posts')
@@ -76,7 +83,6 @@ export class PostsController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   async create(@Body() dto: CreatePostDto) {
-    await this.postsService.findCategory(dto.category);
     await this.postsService.create(dto);
   }
 
@@ -114,8 +120,13 @@ export class PostsController {
   @Get(':id')
   @Public()
   @DocumentSerialization(PostGetSerialization)
-  async getPost(@Param('id', ParseMongoIdPipe) id: string) {
-    const post = await this.postsService.findOne(id, {
+  async getPost(@Param('id') id: string) {
+    const searchParam = isObjectIdOrHexString(id)
+      ? {
+          _id: id,
+        }
+      : { slug: id };
+    const post = await this.postsService.findOneByCondition(searchParam, {
       join: {
         path: 'category',
       },
@@ -124,6 +135,22 @@ export class PostsController {
       throw new NotFoundException(ERRORS_DICTIONARY.POST_NOT_FOUND);
     }
     return post;
+  }
+
+  @Patch(':id')
+  async updatePost(
+    @Param('id', ParseMongoIdPipe) id: string,
+    @Body() dto: UpdatePostDto,
+  ) {
+    const post = await this.postsService.findOne(id);
+    if (!post) {
+      throw new NotFoundException(ERRORS_DICTIONARY.POST_NOT_FOUND);
+    }
+    const category = await this.postsService.findCategory(dto.category);
+    await this.postsService.update(id, {
+      ...dto,
+      category,
+    });
   }
 
   @Delete(':id')
