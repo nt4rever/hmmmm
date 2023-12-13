@@ -1,10 +1,9 @@
 import { BaseServiceAbstract } from '@/services/base';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { CreatePostCategoryDto } from './dto';
 import { Post } from './entities';
 import { PostCategoryRepositoryInterface } from './interfaces/category.interface';
 import { PostRepositoryInterface } from './interfaces/post.interface';
-import { CreatePostCategoryDto } from './dto';
-import { ERRORS_DICTIONARY } from '@/constraints/error-dictionary.constraint';
 
 @Injectable()
 export class PostsService extends BaseServiceAbstract<Post> {
@@ -35,11 +34,7 @@ export class PostsService extends BaseServiceAbstract<Post> {
 
   async findCategory(id: string) {
     try {
-      const category = await this.postCategoriesRepository.findOneById(id);
-      if (!category) {
-        throw new NotFoundException(ERRORS_DICTIONARY.POST_CATEGORY_NOT_FOUND);
-      }
-      return category;
+      return await this.postCategoriesRepository.findOneById(id);
     } catch (error) {
       throw error;
     }

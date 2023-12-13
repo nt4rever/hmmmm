@@ -188,7 +188,7 @@ export class AuthService {
 
       if (!user) return;
       const token = sha256(`${randomUUID()}-${Date.now()}-${user.id}`);
-      await this.cacheManager.set(user.id, token, 1000 * 60 * 30); // 30 minutes
+      await this.cacheManager.set(`RTS_PASSWORD_${user.id}`, token, 1000 * 60 * 30); // 30 minutes
 
       this.mailQueue.add(
         'forgot-password',
@@ -210,7 +210,7 @@ export class AuthService {
         throw new NotFoundException(ERRORS_DICTIONARY.USER_NOT_FOUND);
       }
 
-      const key = await this.cacheManager.get<string>(dto.user_id);
+      const key = await this.cacheManager.get<string>(`RTS_PASSWORD_${dto.user_id}`);
       if (!key || key !== dto.token) {
         throw new BadRequestException(ERRORS_DICTIONARY.UPDATE_FAIL);
       }
@@ -220,7 +220,7 @@ export class AuthService {
         password: hashedPassword,
         refresh_token: [], // Remove all refresh token in DB (logout all device)
       });
-      await this.cacheManager.del(dto.user_id);
+      await this.cacheManager.del(`RTS_PASSWORD_${dto.user_id}`);
     } catch (error) {
       throw error;
     }

@@ -68,11 +68,11 @@ export class Post extends BaseEntity {
   view_count: number;
 
   @Prop({
-    required: true,
+    required: false,
     ref: 'PostCategory',
     type: mongoose.Schema.Types.ObjectId,
   })
-  category: PostCategory;
+  category?: PostCategory;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

@@ -5,6 +5,7 @@ import { HydratedDocument } from 'mongoose';
 export type PostCategoryDocument = HydratedDocument<PostCategory>;
 
 @Schema({
+  collection: 'post_categories',
   timestamps: {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
