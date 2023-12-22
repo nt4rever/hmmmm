@@ -1,4 +1,4 @@
-import { ClientSession } from 'mongoose';
+import { AggregateOptions, ClientSession, PipelineStage } from 'mongoose';
 import { BaseServiceInterface } from './base.interface.service';
 import {
   IDatabaseFindAllOptions,
@@ -57,5 +57,9 @@ export abstract class BaseServiceAbstract<T extends BaseEntity>
 
   async hardRemove(_id: string) {
     return await this.repository.permanentlyDelete(_id);
+  }
+
+  async aggregate(pipeline: PipelineStage[], option?: AggregateOptions): Promise<any> {
+    return await this.repository.aggregate(pipeline, option);
   }
 }

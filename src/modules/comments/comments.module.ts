@@ -37,5 +37,6 @@ import { VotesService } from './vote.service';
       useClass: VotesRepository,
     },
   ],
+  exports: [CommentsService, VotesService],
 })
 export class CommentsModule {}

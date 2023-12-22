@@ -3,7 +3,7 @@ import {
   IDatabaseFindAllOptions,
   IDatabaseGetTotalOptions,
 } from '@/common/interfaces';
-import { ClientSession } from 'mongoose';
+import { AggregateOptions, ClientSession, PipelineStage } from 'mongoose';
 
 export interface BaseRepositoryInterface<T> {
   create(dto: T | any): Promise<T>;
@@ -29,4 +29,6 @@ export interface BaseRepositoryInterface<T> {
   softDelete(_id: string): Promise<boolean>;
 
   permanentlyDelete(_id: string): Promise<boolean>;
+
+  aggregate(pipeline: PipelineStage[], option?: AggregateOptions): Promise<any>;
 }

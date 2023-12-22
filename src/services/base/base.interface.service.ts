@@ -3,7 +3,7 @@ import {
   IDatabaseFindOneOptions,
   IDatabaseGetTotalOptions,
 } from '@/common/interfaces';
-import { ClientSession } from 'mongoose';
+import { AggregateOptions, ClientSession, PipelineStage } from 'mongoose';
 
 export interface Write<T> {
   create(item: T | any): Promise<T>;
@@ -26,6 +26,7 @@ export interface Read<T> {
     find?: Record<string, any>,
     options?: IDatabaseGetTotalOptions<ClientSession>,
   ): Promise<number>;
+  aggregate(pipeline: PipelineStage[], option?: AggregateOptions): Promise<any>;
 }
 
 export interface BaseServiceInterface<T> extends Write<T>, Read<T> {}

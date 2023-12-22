@@ -1,4 +1,10 @@
-import { ClientSession, Model, PopulateOptions } from 'mongoose';
+import {
+  AggregateOptions,
+  ClientSession,
+  Model,
+  PipelineStage,
+  PopulateOptions,
+} from 'mongoose';
 import { BaseRepositoryInterface } from './base.interface.repository';
 import {
   IDatabaseFindOneOptions,
@@ -200,5 +206,9 @@ export abstract class BaseRepositoryAbstract<T extends BaseEntity>
 
   async updateMany(find: Record<string, any>, dto: Partial<T>) {
     await this.model.updateMany({ ...find, deleted_at: null }, dto, { new: true });
+  }
+
+  async aggregate(pipeline: PipelineStage[], option?: AggregateOptions) {
+    return await this.model.aggregate(pipeline, option);
   }
 }
