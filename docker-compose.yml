@@ -3,7 +3,7 @@ version: '3.8'
 services:
   hmmmm_api:
     container_name: hmmmm_api
-    image: registry.gitlab.com/levantanald/hmmmm:latest
+    image: nt4rever/hmmmm:latest
     env_file: .env
     environment:
       - NODE_ENV=production
