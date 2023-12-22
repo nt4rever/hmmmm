@@ -18,7 +18,7 @@ async function bootstrap() {
   );
   app.setGlobalPrefix(configService.get('API_PREFIX'));
   app.enableCors();
-  app.use(morgan('tiny'));
+  app.use(morgan('combined'));
 
   if (
     !configService.get('SWAGGER_ENABLE') ||
