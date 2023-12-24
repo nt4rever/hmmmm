@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { TicketsService } from '../tickets/tickets.service';
-import { oneMonthAgo, oneWeekAgo } from '@/utils/time';
+import { oneMonthAgo, oneWeekAgo, oneYearAgo } from '@/utils/time';
 import { TICKET_STATUS } from '../tickets/entities';
-import { User } from '../users/entities';
+import { ROLES, User } from '../users/entities';
 import { TasksService } from '../tasks/tasks.service';
 import { CommentsService } from '../comments/comments.service';
 import { VotesService } from '../comments/vote.service';
+import { UsersService } from '../users/users.service';
+import { AreasService } from '../areas/areas.service';
 
 @Injectable()
 export class StatsService {
@@ -14,6 +16,8 @@ export class StatsService {
     private readonly taskService: TasksService,
     private readonly commentService: CommentsService,
     private readonly voteService: VotesService,
+    private readonly userService: UsersService,
+    private readonly areaService: AreasService,
   ) {}
 
   async ticketStats(areaId?: string) {
@@ -39,8 +43,9 @@ export class StatsService {
           ...(areaId ? { area: areaId } : {}),
         }),
         this.ticketService.count({
-          status: {
-            $in: [TICKET_STATUS.REJECTED, TICKET_STATUS.CONFIRMED],
+          evidences: {
+            $exists: true,
+            $ne: [],
           },
           ...(areaId ? { area: areaId } : {}),
         }),
@@ -115,6 +120,78 @@ export class StatsService {
         total_vote: totalVote,
         summary_report: summaryReport,
         summary_task: summaryTask,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async admin(user: User) {
+    try {
+      const [
+        totalReport,
+        totalUser,
+        totalVolunteer,
+        totalArea,
+        summaryReport,
+        reportPerMonth,
+      ] = await Promise.all([
+        this.ticketService.count({
+          ...(user.role === ROLES.AreaManager ? { area: user.area._id } : {}),
+        }),
+        this.userService.count({
+          role: ROLES.User,
+        }),
+        this.userService.count({
+          role: ROLES.Volunteer,
+          ...(user.role === ROLES.AreaManager ? { area: user.area._id } : {}),
+        }),
+        this.areaService.count({}),
+        this.ticketService.aggregate([
+          {
+            $match: {
+              ...(user.role === ROLES.AreaManager ? { area: user.area._id } : {}),
+            },
+          },
+          {
+            $group: {
+              _id: { status: '$status' },
+              count: {
+                $sum: 1,
+              },
+            },
+          },
+        ]),
+        this.ticketService.aggregate([
+          {
+            $match: {
+              created_at: {
+                $gte: oneYearAgo(),
+              },
+              ...(user.role === ROLES.AreaManager ? { area: user.area._id } : {}),
+            },
+          },
+          {
+            $group: {
+              _id: {
+                month: {
+                  $month: '$created_at',
+                },
+              },
+              count: {
+                $sum: 1,
+              },
+            },
+          },
+        ]),
+      ]);
+      return {
+        total_report: totalReport,
+        total_user: totalUser,
+        total_volunteer: totalVolunteer,
+        total_area: totalArea,
+        summary_report: summaryReport,
+        report_per_month: reportPerMonth,
       };
     } catch (error) {
       throw error;

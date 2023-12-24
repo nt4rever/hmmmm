@@ -9,3 +9,9 @@ export function oneMonthAgo() {
   oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
   return oneMonthAgo;
 }
+
+export function oneYearAgo() {
+  const oneYearAgo = new Date();
+  oneYearAgo.setDate(oneYearAgo.getDate() - 365);
+  return oneYearAgo;
+}
