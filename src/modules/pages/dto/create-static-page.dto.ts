@@ -1,5 +1,23 @@
-import { IsEnum, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  MaxLength,
+  ValidateNested,
+} from 'class-validator';
 import { STATIC_PAGE_TYPE } from '../entities/static-page.entity';
+import { Type } from 'class-transformer';
+
+class StaticPageContentDto {
+  @IsNotEmpty()
+  @MaxLength(20)
+  lang: string;
+
+  @IsNotEmpty()
+  @MaxLength(1000000)
+  value: string;
+}
 
 export class CreateStaticPageDto {
   @IsNotEmpty()
@@ -7,8 +25,10 @@ export class CreateStaticPageDto {
   type: STATIC_PAGE_TYPE;
 
   @IsNotEmpty()
-  @MaxLength(100000)
-  content: string;
+  @ValidateNested()
+  @IsArray()
+  @Type(() => StaticPageContentDto)
+  content: StaticPageContentDto[];
 
   @IsOptional()
   @MaxLength(200)

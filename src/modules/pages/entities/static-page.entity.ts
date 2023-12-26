@@ -10,6 +10,25 @@ export enum STATIC_PAGE_TYPE {
 export type StaticPageDocument = HydratedDocument<StaticPage>;
 
 @Schema({
+  _id: false,
+})
+export class StaticPageContent {
+  @Prop({
+    required: true,
+    type: String,
+  })
+  lang: string;
+
+  @Prop({
+    required: true,
+    type: String,
+  })
+  value: string;
+}
+
+const StaticPageSchemaSchema = SchemaFactory.createForClass(StaticPageContent);
+
+@Schema({
   collection: 'static_pages',
   timestamps: {
     createdAt: 'created_at',
@@ -26,9 +45,9 @@ export class StaticPage extends BaseEntity {
 
   @Prop({
     required: true,
-    type: String,
+    type: [{ type: StaticPageSchemaSchema }],
   })
-  content: string;
+  content: StaticPageContent[];
 
   @Prop({
     required: false,
