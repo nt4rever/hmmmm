@@ -16,7 +16,6 @@ export class ExportsService {
         { header: 'Status', key: 'status', width: 15 },
         { header: 'Created by', key: 'created_by', width: 20 },
         { header: 'Created at', key: 'created_at', width: 15 },
-        { header: 'Updated at', key: 'updated_at', width: 15 },
         { header: 'Area', key: 'area', width: 25 },
         { header: 'Location', key: 'location', width: 15 },
         { header: 'Map', key: 'location_map_link', width: 15 },

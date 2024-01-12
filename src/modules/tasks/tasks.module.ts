@@ -5,6 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Task, TaskSchema } from './entities';
 import { TasksRepository } from '@/repositories/task.repository';
 import { TicketsModule } from '../tickets/tickets.module';
+import { UsersModule } from '../users/users.module';
+import { BullModule } from '@nestjs/bullmq';
+import { SendMailProcessor } from './queues/task.processor';
 
 @Module({
   imports: [
@@ -15,6 +18,11 @@ import { TicketsModule } from '../tickets/tickets.module';
       },
     ]),
     forwardRef(() => TicketsModule),
+    UsersModule,
+    BullModule.registerQueue({
+      name: 'mail-task',
+      prefix: 'task',
+    }),
   ],
   controllers: [TasksController],
   providers: [
@@ -23,6 +31,7 @@ import { TicketsModule } from '../tickets/tickets.module';
       provide: 'TasksRepositoryInterface',
       useClass: TasksRepository,
     },
+    SendMailProcessor,
   ],
   exports: [TasksService],
 })

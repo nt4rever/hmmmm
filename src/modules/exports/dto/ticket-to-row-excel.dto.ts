@@ -7,7 +7,6 @@ export class TicketToRowExcelDto {
   description: string;
   created_by: string;
   created_at: Date;
-  updated_at: Date;
   area: string;
   location: string;
   location_map_link: string;
@@ -24,7 +23,6 @@ export class TicketToRowExcelDto {
       ticket.created_by.last_name,
     );
     this.created_at = ticket.created_at;
-    this.updated_at = ticket.created_at;
     this.area = ticket.area.name;
     this.location = `${ticket.lat}, ${ticket.lng}`;
     this.location_map_link = `https://www.google.com/maps/search/?api=1&query=${ticket.lat},${ticket.lng}`;

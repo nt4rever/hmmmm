@@ -66,4 +66,22 @@ export class MailService {
       this.logger.error(error);
     }
   }
+
+  async cancelTask(email: string[], name: string, ticketId: string) {
+    try {
+      const url = `${process.env.APP_ADMIN_URL}/reports/${ticketId}`;
+      await this.mailerService.sendMail({
+        to: email,
+        subject: '[RTS] Volunteer has canceled task',
+        template: './cancel-task.hbs',
+        context: {
+          ticketId,
+          name,
+          url,
+        },
+      });
+    } catch (error) {
+      this.logger.error(error);
+    }
+  }
 }

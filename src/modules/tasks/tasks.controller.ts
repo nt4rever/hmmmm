@@ -40,6 +40,9 @@ import { TaskGetSerialization, TaskPagingSerialization } from './serializations'
 import { TasksService } from './tasks.service';
 import { FindAllSerialization } from '@/decorators/api-find-all.decorator';
 import { ORDER_DIRECTION_TYPE } from '@/common/interfaces';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { getFullName } from '@/utils/string';
 
 @Controller('tasks')
 @ApiTags('tasks')
@@ -51,6 +54,8 @@ export class TasksController {
     private readonly tasksService: TasksService,
     private readonly evidencesService: EvidencesService,
     private readonly paginationService: PaginationService,
+    @InjectQueue('mail-task')
+    private readonly mailQueue: Queue,
   ) {}
 
   @Get()
@@ -240,5 +245,14 @@ export class TasksController {
     await this.tasksService.update(task.id, {
       status: TASK_STATUS.CANCELED,
     });
+    this.mailQueue.add(
+      'cancel-task',
+      {
+        ticketId: task.ticket._id.toString(),
+        name: getFullName(user.last_name, user.first_name),
+        area: user.area?._id.toString(),
+      },
+      { removeOnComplete: true },
+    );
   }
 }
