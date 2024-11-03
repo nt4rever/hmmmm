@@ -25,7 +25,7 @@ export class AwsService {
 
   async uploadPublicFile(dataBuffer: Buffer, key: string): Promise<string> {
     try {
-      const data = await new Upload({
+      await new Upload({
         client: this.s3,
         params: {
           ACL: 'public-read',
@@ -34,9 +34,7 @@ export class AwsService {
           Body: dataBuffer,
         },
       }).done();
-      return (
-        data['Location'] ?? `${this.configService.get<string>('aws.s3.baseUrl')}/${key}`
-      );
+      return `${this.configService.get<string>('aws.s3.baseUrl')}/${key}`;
     } catch (error) {
       throw error;
     }
